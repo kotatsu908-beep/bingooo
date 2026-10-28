@@ -13,8 +13,9 @@ main{max-width:1180px;margin:18px auto;padding:0 14px 40px;display:grid;grid-tem
 .panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 18px #1b37630b;min-width:0}
 h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px}
 label{display:block;font-size:13px;font-weight:700;margin:10px 0 5px}input,textarea,select,button{font:inherit}input,textarea,select{width:100%;padding:10px;border:1px solid #c8d2e1;border-radius:9px;background:#fff;color:var(--ink)}
-textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button{border:0;border-radius:10px;padding:10px 13px;background:#e9eef8;color:#243653;font-weight:700;cursor:pointer}button.primary{background:var(--blue);color:white}button.good{background:#e2f5eb;color:#176848}button.danger{background:#ffeded;color:#a32c35}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#65748a;font-size:12px;line-height:1.6}.status{padding:10px;border-radius:10px;background:#edf3ff;font-size:13px;line-height:1.5;margin:8px 0}.hidden{display:none!important}.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.cell{min-height:78px;padding:7px 4px;border:2px solid #d7e0ed;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.5vw,15px);font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere;position:relative;cursor:pointer}.cell.hard:after{content:"★";position:absolute;right:5px;top:2px;color:#c84d55;font-size:11px}.cell.open{background:#dff5e9;border-color:#38a477;color:#165f45}.cell.free{background:#fff3cc;border-color:#edc14d}.cell.winline{box-shadow:inset 0 0 0 3px #efb83f}.small{font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf1f8;font-size:12px}.players{display:flex;gap:7px;flex-wrap:wrap}.player{border:1px solid var(--line);padding:8px 10px;border-radius:10px;font-size:13px}.player.active{border-color:var(--blue);background:#edf2ff;font-weight:800}.feed{max-height:280px;overflow:auto}.feeditem{padding:10px 0;border-bottom:1px solid #edf0f5;font-size:13px}.feeditem:last-child{border-bottom:0}.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{font-size:14px;font-weight:800}.callrow{display:grid;grid-template-columns:1fr auto;gap:8px}.footer{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
-@media(max-width:850px){main{grid-template-columns:1fr}.board{gap:4px}.cell{min-height:62px;padding:5px 2px}.setupgrid{grid-template-columns:1fr}}
+textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button{border:0;border-radius:10px;padding:10px 13px;background:#e9eef8;color:#243653;font-weight:700;cursor:pointer}button.primary{background:var(--blue);color:white}button.good{background:#e2f5eb;color:#176848}button.danger{background:#ffeded;color:#a32c35}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#65748a;font-size:12px;line-height:1.6}.status{padding:10px;border-radius:10px;background:#edf3ff;font-size:13px;line-height:1.5;margin:8px 0}.hidden{display:none!important}.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.cell{min-height:78px;padding:7px 4px;border:2px solid #d7e0ed;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.5vw,15px);font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere;position:relative;cursor:pointer}.cell.hard:after{content:"★";position:absolute;right:5px;top:2px;color:#c84d55;font-size:11px}.cell.open{background:#dff5e9;border-color:#38a477;color:#165f45}.cell.selected{background:#dce7ff;border-color:#315cc9;box-shadow:inset 0 0 0 2px #315cc9}.cell.free{background:#fff3cc;border-color:#edc14d}.cell.winline{box-shadow:inset 0 0 0 3px #efb83f}.small{font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf1f8;font-size:12px}.players{display:flex;gap:7px;flex-wrap:wrap}.player{border:1px solid var(--line);padding:8px 10px;border-radius:10px;font-size:13px}.player.active{border-color:var(--blue);background:#edf2ff;font-weight:800}.feed{max-height:280px;overflow:auto}.feeditem{padding:10px 0;border-bottom:1px solid #edf0f5;font-size:13px}.feeditem:last-child{border-bottom:0}.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{font-size:14px;font-weight:800}.callrow{display:grid;grid-template-columns:1fr auto;gap:8px}.footer{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:850px){main{grid-template-columns:1fr;margin:10px auto;padding:0 8px 24px;gap:10px}.panel{padding:12px;border-radius:13px}.board{gap:4px;margin:10px 0}.cell{min-height:clamp(52px,15vw,78px);padding:4px 1px;border-width:1px;border-radius:8px;font-size:clamp(10px,2.8vw,14px);line-height:1.2;word-break:break-word}.boardtop{align-items:flex-start}header{padding:14px 12px}header p{font-size:13px}h2{font-size:17px}.row{gap:6px}.row button,.callrow button,button{min-height:42px;padding:9px 10px}.callrow{grid-template-columns:minmax(0,1fr) auto;gap:6px}.status{padding:8px;margin:6px 0}.feed{max-height:220px}.setupgrid{grid-template-columns:1fr}textarea{font-size:14px;min-height:120px}input,select{min-height:42px}}
+@media(max-width:420px){.cell{font-size:10px;min-height:54px}.pill{font-size:11px}.board{gap:3px}.row .status{flex:1 1 42%}.callrow button{font-size:13px}}
 </style>
 </head>
 <body>
@@ -26,7 +27,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <label for="playerName">あなたの名前</label><input id="playerName" maxlength="20" placeholder="例：あおい">
 <div class="row" style="margin-top:8px"><button class="primary" id="createRoom">新しい部屋を作る</button><button id="joinRoom">この部屋に参加</button></div>
 <div id="shareArea" class="hidden"><label>招待URL（LINEで共有）</label><input id="shareUrl" readonly><div class="row" style="margin-top:7px"><button id="copyUrl">URLをコピー</button><button id="copyCode">部屋コードをコピー</button></div></div>
-<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードで該当するマスをひとつ選びます。</p></div>
+<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
 <div class="footer">
 <h2>② お題を編集（ホスト用）</h2>
 <p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は「中央＋両斜め」の9マスに配置します。</p>
@@ -51,7 +52,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <div class="callrow"><input id="wordInput" maxlength="60" placeholder="例：いちご"><button class="primary" id="declareBtn">宣言する</button></div>
 <p class="muted">宣言した人を含め、全員がその単語に当てはまるマスをひとつだけ開けます。該当マスがない場合は「該当マスなし」を押してください。自分の番以外は宣言できません。</p>
 <div id="claimArea" class="status hidden"></div>
-<div class="row"><button id="noneBtn">該当マスなし</button><button id="undoBtn">直前の宣言を取り消す（ホスト）</button></div>
+<div class="row"><button id="confirmCellBtn" class="primary" disabled>選んだマスを開く（確定）</button><button id="noneBtn">該当マスなし</button></div><div class="row" style="margin-top:6px"><button id="undoBtn">直前の宣言を取り消す（ホスト）</button><button id="deleteRoomBtn" class="danger">部屋を削除する（ホスト）</button></div>
 <h2 style="margin-top:20px">⑤ 宣言・開封の記録</h2>
 <div class="row"><button id="exportBtn">記録をCSV保存</button><button id="resetBtn" class="danger">ゲームをやり直す（ホスト）</button></div>
 <div id="history" class="feed"></div>
@@ -158,7 +159,173 @@ const sampleNormal = `動物
 自然にあるもの
 人工的なもの
 名前に「ん」が入るもの
-名前が3文字のもの`;
+名前が3文字のもの
+家族に関係するもの
+友達と遊ぶときに使うもの
+旅行先で買うもの
+キャンプで使うもの
+海水浴で使うもの
+運動会にあるもの
+文化祭にあるもの
+誕生日に関係するもの
+クリスマスに関係するもの
+お正月に関係するもの
+病気のときに使うもの
+掃除に使うもの
+洗濯に使うもの
+料理に使うもの
+冷蔵庫に入っているもの
+冷凍庫に入っているもの
+玄関にあるもの
+お風呂場にあるもの
+寝室にあるもの
+リビングにあるもの
+学校の授業に関係するもの
+体育で使うもの
+理科で使うもの
+音楽の授業で使うもの
+図工で使うもの
+机の上にあるもの
+かばんに入っているもの
+ポケットに入るもの
+片手で持てるもの
+両手で持つもの
+転がるもの
+回るもの
+折りたためるもの
+開け閉めするもの
+押すもの
+引っ張るもの
+切るもの
+貼るもの
+洗えるもの
+乾かすもの
+充電するもの
+電池で動くもの
+ボタンがあるもの
+画面があるもの
+写真を撮るもの
+連絡に使うもの
+時間を測るもの
+道を案内するもの
+地図に関係するもの
+お金を入れるもの
+鍵を使うもの
+列に並ぶ場所にあるもの
+待ち時間に見るもの
+音楽を聴くときに使うもの
+動画を見るときに使うもの
+読書に使うもの
+文字を入力するもの
+絵を描くもの
+記録を残すもの
+プレゼントでもらうもの
+捨てる前に分別するもの
+リサイクルできるもの
+使い捨てのもの
+何度も使えるもの
+壊れやすいもの
+修理できるもの
+高価なもの
+安く買えるもの
+昔はよく使われたもの
+最近よく見るもの
+海外旅行で必要なもの
+日本独特のもの
+日本の伝統文化に関係するもの
+お寺にあるもの
+神社にあるもの
+美術館にあるもの
+図書館にあるもの
+映画館にあるもの
+劇場にあるもの
+空港にあるもの
+港にあるもの
+道路にあるもの
+線路に関係するもの
+信号に関係するもの
+消防署にあるもの
+警察署にあるもの
+郵便局にあるもの
+ホテルにあるもの
+レストランにあるもの
+カフェにあるもの
+美容院にあるもの
+スポーツ観戦で見るもの
+応援に使うもの
+勝負に関係するもの
+チームで使うもの
+記念日に関係するもの
+季節限定のもの
+旬があるもの
+発酵しているもの
+焼いて食べるもの
+煮て食べるもの
+揚げて食べるもの
+生で食べるもの
+皮をむいて食べるもの
+種があるもの
+骨があるもの
+甘い飲み物
+炭酸が入っているもの
+温めて飲むもの
+冷やして飲むもの
+朝に聞こえる音
+自然の中で聞こえる音
+大きな音を出すもの
+静かな場所にあるもの
+いい香りがする植物
+とげがあるもの
+葉っぱが大きい植物
+冬眠する動物
+群れで暮らす動物
+夜に活動する動物
+ペットとして飼われる動物
+絶滅危惧種に関係するもの
+海の生き物
+淡水にいる生き物
+足がない生き物
+足が6本ある生き物
+羽がある生き物
+殻がある生き物
+卵から生まれる生き物
+子どもに人気のもの
+大人がよく使うもの
+高齢者に役立つもの
+雨を防ぐもの
+寒さを防ぐもの
+暑さをしのぐもの
+眠る前にすることに関係するもの
+朝起きて最初に使うもの
+外出前に確認するもの
+忘れると困るもの
+なくすと困るもの
+家に複数あるもの
+同じ形が並んでいるもの
+模様があるもの
+縞模様のもの
+水玉模様のもの
+文字が印刷されたもの
+ロゴがついているもの
+キャラクターが描かれたもの
+名前をつけるもの
+名前が長いもの
+名前が短いもの
+ひらがなで書くことが多いもの
+カタカナで書くことが多いもの
+漢字で書くことが多いもの
+英語でよく見るもの
+略称で呼ばれるもの
+音で操作するもの
+声を録音するもの
+映像に映るもの
+天気予報に関係するもの
+災害への備えに使うもの
+避難所にあるもの
+健康管理に使うもの
+体温を測るもの
+体を守るもの
+安全のために身につけるもの`;
 const sampleHard = `歴史上の人物
 4本脚のもの
 「あ」で始まる3文字
@@ -189,9 +356,102 @@ const sampleHard = `歴史上の人物
 日本で見かける赤いもの
 持ち上げるのが大変なもの
 人によって答えが違いそうなもの
-実物を見たことがない人も多いもの`;
+実物を見たことがない人も多いもの
+名前が漢字一文字で表せるもの
+名前に同じ文字が2回出てくるもの
+左右で形が違うもの
+上から読むもの
+裏返すと意味が変わるもの
+音読みと訓読みがあるもの
+名前に色が含まれるもの
+名前に動物が含まれるもの
+名前に植物が含まれるもの
+五感のうち複数に関係するもの
+目を閉じても分かるもの
+遠くからでも見つけやすいもの
+見た目と中身の印象が違うもの
+昔と今で使い方が変わったもの
+地域によって呼び方が違うもの
+国によって形が違うもの
+同じ名前なのに別のものを指す言葉
+一文字変えると別の意味になる言葉
+反対語が思い浮かぶもの
+季節によって価値が変わるもの
+毎日少しずつ変わるもの
+時間が経つと価値が上がるもの
+時間が経つと価値が下がるもの
+自然に戻るもの
+自然には分解されにくいもの
+人間より長生きするもの
+人間より小さな生き物
+肉眼では見えにくいもの
+世界で最も有名なものの一つ
+日本でしか見られないもの
+日本より海外で有名なもの
+名前に数字が含まれる地名
+世界に複数の時差を生むもの
+音を出さずに情報を伝えるもの
+触れずに操作できるもの
+重さを感じにくいもの
+形を変えて使うもの
+一つで複数の役割を持つもの
+使う人によって用途が変わるもの
+答えが一つに決まらないもの
+人によって価値観が分かれるもの
+見た人の記憶に残りやすいもの
+子どもの頃と大人で印象が変わるもの
+名前の由来が面白いもの
+発明した人が分かっているもの
+発明者がはっきりしないもの
+歴史の転換点に関係するもの
+世界の文化をつないだもの
+人類の生活を大きく変えたもの
+なくても生活できるがあると便利なもの
+なくなると社会が困るもの
+一見役に立たなそうで役に立つもの
+小さいのに大きな影響を与えるもの
+一度に二つ以上必要になるもの
+使う前に準備が必要なもの
+使い方を間違えると危険なもの
+見えない力が関係するもの
+温度で状態が変わるもの
+圧力で形が変わるもの
+光の反射が関係するもの
+磁石に関係するもの
+地球の自転に関係するもの
+月の満ち欠けに関係するもの
+重力を実感できるもの
+水の循環に関係するもの
+生態系を支えるもの
+人間の体内にあるもの
+体の外からは見えないもの
+一度に大量に作るのが難しいもの
+職人技が必要なもの
+地域の伝統を守るもの
+祭りでしか見かけないもの
+学校で習うが日常では使わないもの
+専門家しか知らないようなもの
+名前を聞いても姿が想像しにくいもの
+名前から用途が想像できるもの
+似ているのに分類が違うもの
+分類の境界があいまいなもの
+何年もかけて完成するもの
+短時間で完成するもの
+一瞬で消えるもの
+何世代にも受け継がれるもの
+記録に残りにくいもの
+写真だけでは伝わらないもの
+遠くにいる人と共有できるもの
+人と人を仲良くさせるもの
+意見が分かれる食べ物
+贈ると相手の好みが問われるもの
+一つの名前で複数の形があるもの
+地図記号で表せるもの
+世界共通のマークがあるもの
+災害時に特に重要になるもの
+人生の節目に登場するもの`;
 const $=id=>document.getElementById(id);
-let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null;
+let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null,selectedCellIndex=null;
 const uid=()=>Math.random().toString(36).slice(2,10);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function splitTopics(text){return [...new Set(text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(s=>s.replace(/^"|"$/g,'')))];}
@@ -254,21 +514,28 @@ function renderAll(){
  $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}</span>`}).join('');
  $('turnLabel').textContent='宣言する番：'+(room.players?.[currentTurnId()]?.name||'—');
  $('declareBtn').disabled=localPlayerId!==currentTurnId();$('wordInput').disabled=localPlayerId!==currentTurnId();
- const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId];b.onclick=()=>markCell(i);board.appendChild(b)});const lines=countLines(me.card);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';}
+ const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'')+(selectedCellIndex===i?' selected':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId]||room.claims[room.activeClaim].pending[localPlayerId].selected!==-2;b.onclick=()=>markCell(i);board.appendChild(b)});const lines=countLines(me.card);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';}
  const active=room.activeClaim?room.claims?.[room.activeClaim]:null;
- if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを1つクリックしてください。<br><span class="muted">選んだマス：${active.pending[localPlayerId].selected!==-2?'選択済み':'未選択'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent=''}
+ if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを選び、「選んだマスを開く（確定）」を押してください。<br><span class="muted">${selectedCellIndex!==null?'選択中：'+esc(me?.card?.[selectedCellIndex]?.topic||''):'まだマスを選んでいません'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent='';selectedCellIndex=null} $('confirmCellBtn').disabled=selectedCellIndex===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;
  $('noneBtn').disabled=!active||!active.pending?.[localPlayerId];$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
 }
 async function declareWord(){if(!room||localPlayerId!==currentTurnId())return;const word=$('wordInput').value.trim();if(!word)return alert('宣言する単語を入力してください。');const id=uid();const pending={};(room.turnOrder||[]).forEach(pid=>{if(room.players?.[pid])pending[pid]={selected:-2}});const claim={id,word,by:localPlayerId,byName:currentPlayer()?.name,time:Date.now(),pending};await roomRef.child('claims/'+id).set(claim);await roomRef.update({activeClaim:id});$('wordInput').value='';}
 $('declareBtn').onclick=declareWord;$('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')declareWord()});
-async function markCell(i){
+function markCell(i){
  const active=room?.claims?.[room.activeClaim],me=currentPlayer();if(!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2)return;
- const cell=me.card[i];if(!cell||cell.open)return;
+ const cell=me?.card?.[i];if(!cell||cell.open)return;
+ selectedCellIndex=i;renderAll();
+}
+async function confirmCell(){
+ const i=selectedCellIndex,active=room?.claims?.[room.activeClaim],me=currentPlayer();
+ if(i===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2)return;
+ const cell=me?.card?.[i];if(!cell||cell.open){selectedCellIndex=null;renderAll();return;}
  await roomRef.child('players/'+localPlayerId+'/card/'+i).update({open:true,by:active.word});
  await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:i,topic:cell.topic});
- await finishIfDone();
+ selectedCellIndex=null;await finishIfDone();
 }
-$('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId])return;await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await finishIfDone()};
+$('confirmCellBtn').onclick=confirmCell;
+$('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId])return;selectedCellIndex=null;await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await finishIfDone()};
 async function finishIfDone(){
  const snap=await roomRef.get();const s=snap.val(),a=s.claims[s.activeClaim];if(Object.values(a.pending||{}).some(x=>x.selected===-2))return;
  const results=Object.entries(a.pending).map(([pid,x])=>({id:pid,name:s.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected}));
@@ -279,6 +546,13 @@ async function finishIfDone(){
 $('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value);if(n.length<16||h.length<9)return alert('普通のお題16個以上、難しいお題9個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
 $('sampleBtn').onclick=setSamples;
 $('resetBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!confirm('全員のカードと記録をリセットしますか？'))return;const n=room.normalTopics,h=room.hardTopics;for(const pid of room.turnOrder||[]){await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});};
+$('deleteRoomBtn').onclick=async()=>{
+ if(!roomRef||!room||!isHost)return alert('部屋を削除できるのはホストだけです。');
+ if(!confirm('この部屋と、参加者のカード・宣言記録をすべて削除します。元に戻せません。本当に削除しますか？'))return;
+ if(!confirm('最終確認：本当にこの部屋を削除しますか？'))return;
+ try{if(unsub)unsub();await roomRef.remove();room=null;roomRef=null;roomId=null;isHost=false;localPlayerId=null;selectedCellIndex=null;history.replaceState({},'',location.pathname);$('shareArea').classList.add('hidden');$('playersArea').classList.add('hidden');$('board').innerHTML='';$('roomStatus').textContent='部屋を削除しました。新しい部屋を作成できます。';$('myName').textContent='未参加';$('roomCodeLabel').textContent='部屋：—';$('turnLabel').textContent='順番：—';$('bingoCount').textContent='ビンゴ 0ライン';$('openCount').textContent='開けた数 0 / 25';$('history').innerHTML='';alert('部屋を削除しました。');}
+ catch(e){alert('部屋を削除できませんでした：'+e.message)}
+};
 $('undoBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!room.history?.length)return alert('取り消せる記録がありません。');if(!confirm('直前の宣言記録を削除します。カードの開封状態は自動では戻りません。続けますか？'))return;await roomRef.update({history:room.history.slice(0,-1)});};
 $('exportBtn').onclick=()=>{if(!room)return alert('先に部屋に参加してください。');const rows=[['単語','宣言者','日時','参加者','開けた要素','マス番号']];(room.history||[]).forEach(h=>(h.results||[]).forEach(x=>rows.push([h.word,h.byName,new Date(h.time).toISOString(),x.name,x.topic,x.index>=0?x.index+1:''])));const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='お題ビンゴ記録.csv';a.click();URL.revokeObjectURL(a.href)};
 setSamples();
