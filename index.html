@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>お題ビンゴ｜みんなで遊ぼう</title>
+<style>
+:root{--bg:#f3f6fb;--ink:#202b3c;--blue:#315cc9;--line:#d5deeb;--red:#c94d55;--green:#25845f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(120deg,#2448a4,#4476db);color:white;padding:20px max(16px,calc((100% - 1180px)/2));}
+header h1{margin:0;font-size:clamp(22px,4vw,32px)}header p{margin:6px 0 0;opacity:.9}
+main{max-width:1180px;margin:18px auto;padding:0 14px 40px;display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:16px}
+.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 18px #1b37630b;min-width:0}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 5px}input,textarea,select,button{font:inherit}input,textarea,select{width:100%;padding:10px;border:1px solid #c8d2e1;border-radius:9px;background:#fff;color:var(--ink)}
+textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button{border:0;border-radius:10px;padding:10px 13px;background:#e9eef8;color:#243653;font-weight:700;cursor:pointer}button.primary{background:var(--blue);color:white}button.good{background:#e2f5eb;color:#176848}button.danger{background:#ffeded;color:#a32c35}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#65748a;font-size:12px;line-height:1.6}.status{padding:10px;border-radius:10px;background:#edf3ff;font-size:13px;line-height:1.5;margin:8px 0}.hidden{display:none!important}.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.cell{min-height:78px;padding:7px 4px;border:2px solid #d7e0ed;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.5vw,15px);font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere;position:relative;cursor:pointer}.cell.hard:after{content:"★";position:absolute;right:5px;top:2px;color:#c84d55;font-size:11px}.cell.open{background:#dff5e9;border-color:#38a477;color:#165f45}.cell.free{background:#fff3cc;border-color:#edc14d}.cell.winline{box-shadow:inset 0 0 0 3px #efb83f}.small{font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf1f8;font-size:12px}.players{display:flex;gap:7px;flex-wrap:wrap}.player{border:1px solid var(--line);padding:8px 10px;border-radius:10px;font-size:13px}.player.active{border-color:var(--blue);background:#edf2ff;font-weight:800}.feed{max-height:280px;overflow:auto}.feeditem{padding:10px 0;border-bottom:1px solid #edf0f5;font-size:13px}.feeditem:last-child{border-bottom:0}.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{font-size:14px;font-weight:800}.callrow{display:grid;grid-template-columns:1fr auto;gap:8px}.footer{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:850px){main{grid-template-columns:1fr}.board{gap:4px}.cell{min-height:62px;padding:5px 2px}.setupgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🎯 お題ビンゴ</h1><p>単語をひとつ宣言して、当てはまるマスをひとつだけ開けよう！</p></header>
+<main>
+<section class="panel">
+<h2>① 部屋・参加</h2>
+<div id="roomStatus" class="status">まず名前を入力し、部屋を作成するか、招待URLを開いて参加してください。</div>
+<label for="playerName">あなたの名前</label><input id="playerName" maxlength="20" placeholder="例：あおい">
+<div class="row" style="margin-top:8px"><button class="primary" id="createRoom">新しい部屋を作る</button><button id="joinRoom">この部屋に参加</button></div>
+<div id="shareArea" class="hidden"><label>招待URL（LINEで共有）</label><input id="shareUrl" readonly><div class="row" style="margin-top:7px"><button id="copyUrl">URLをコピー</button><button id="copyCode">部屋コードをコピー</button></div></div>
+<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードで該当するマスをひとつ選びます。</p></div>
+<div class="footer">
+<h2>② お題を編集（ホスト用）</h2>
+<p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は「中央＋両斜め」の9マスに配置します。</p>
+<label for="normalTopics">普通のお題（16個以上）</label><textarea id="normalTopics"></textarea>
+<label for="hardTopics">難しいお題（9個以上）</label><textarea id="hardTopics"></textarea>
+<div class="row"><button id="sampleBtn">サンプル100題を読み込む</button><button id="applyTopics" class="primary">お題を部屋に反映</button></div>
+<p class="muted">CSVは1列のリストとして読み込みます。1行目が「お題」などの見出しでも、見出しを含めて読み込むので必要なら削除してください。</p>
+</div>
+<div class="footer">
+<h3>接続設定（初回のみ）</h3>
+<p class="muted">別々のスマホ・PCでリアルタイム共有するにはFirebaseの設定が必要です。管理者が下記を入力して保存し、同じHTMLを公開してください。設定はこのブラウザに保存されます。</p>
+<label for="firebaseConfig">Firebase Web設定（JSON）</label><textarea id="firebaseConfig" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"https://...-default-rtdb.firebaseio.com","projectId":"...","appId":"..."}'></textarea>
+<div class="row"><button id="saveConfig">設定を保存・接続</button><button id="forgetConfig">設定を消す</button></div>
+<p class="muted">Firebase Consoleで Authentication の匿名ログインを有効化し、Realtime Databaseを作成してください。安全なルール例はHTMLと一緒に案内する説明を参照してください。</p>
+</div>
+</section>
+<section class="panel">
+<div class="boardtop"><h2>③ あなたのビンゴカード</h2><span id="myName" class="pill">未参加</span></div>
+<div id="board" class="board"></div>
+<div class="row"><div class="status"><div class="metric" id="bingoCount">ビンゴ 0ライン</div><div class="small" id="openCount">開けた数 0 / 25</div></div><div class="status"><div class="metric" id="turnLabel">順番：—</div><div class="small" id="roomCodeLabel">部屋：—</div></div></div>
+<h2 style="margin-top:18px">④ 単語を宣言</h2>
+<div class="callrow"><input id="wordInput" maxlength="60" placeholder="例：いちご"><button class="primary" id="declareBtn">宣言する</button></div>
+<p class="muted">宣言した人を含め、全員がその単語に当てはまるマスをひとつだけ開けます。該当マスがない場合は「該当マスなし」を押してください。自分の番以外は宣言できません。</p>
+<div id="claimArea" class="status hidden"></div>
+<div class="row"><button id="noneBtn">該当マスなし</button><button id="undoBtn">直前の宣言を取り消す（ホスト）</button></div>
+<h2 style="margin-top:20px">⑤ 宣言・開封の記録</h2>
+<div class="row"><button id="exportBtn">記録をCSV保存</button><button id="resetBtn" class="danger">ゲームをやり直す（ホスト）</button></div>
+<div id="history" class="feed"></div>
+<div class="footer"><h3>遊び方のおすすめ</h3><p class="muted">・「いちご」なら「赤いもの」「甘いもの」など、当てはまる候補が複数あっても開けられるのは1マスだけ。<br>・開けるマスはプレイヤーごとに選びます。同じ単語でも、カードによって開くマスは違ってOK。<br>・同点対策に「先にビンゴした人が勝ち」か「全員のビンゴ数で勝負」を最初に決めておくとスムーズです。</p></div>
+</section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+const sampleNormal = `動物
+乗りもの
+果物
+野菜
+色
+スポーツ
+楽器
+国名
+都道府県
+食べ物
+飲み物
+家具
+家電
+衣類
+学校にあるもの
+家にあるもの
+丸いもの
+四角いもの
+長いもの
+短いもの
+大きいもの
+小さいもの
+柔らかいもの
+硬いもの
+甘いもの
+酸っぱいもの
+辛いもの
+苦いもの
+冷たいもの
+熱いもの
+朝に使うもの
+夜に使うもの
+毎日使うもの
+持ち歩くもの
+文字が書いてあるもの
+数字があるもの
+音が出るもの
+光るもの
+水に浮くもの
+水に沈むもの
+空を飛ぶもの
+走るもの
+泳ぐもの
+植物
+花
+木
+虫
+鳥
+魚
+海にいるもの
+山にあるもの
+公園にあるもの
+台所にあるもの
+お祭りにあるもの
+旅行で使うもの
+仕事で使うもの
+文房具
+本に関係するもの
+映画に関係するもの
+音楽に関係するもの
+ゲームに関係するもの
+日本にあるもの
+海外にあるもの
+冬に使うもの
+夏に使うもの
+雨の日に使うもの
+晴れの日に使うもの
+電気を使うもの
+電気を使わないもの
+プラスチック製のもの
+紙でできたもの
+木でできたもの
+金属でできたもの
+ガラスでできたもの
+食べられるもの
+身につけるもの
+人が乗るもの
+人が住むもの
+人が集まる場所
+お金で買えるもの
+贈り物にするもの
+朝ごはんに食べるもの
+お弁当に入るもの
+コンビニにあるもの
+スーパーにあるもの
+駅にあるもの
+病院にあるもの
+動物園にいるもの
+水族館にいるもの
+音が大きいもの
+いい匂いがするもの
+匂いが強いもの
+透明なもの
+自然にあるもの
+人工的なもの
+名前に「ん」が入るもの
+名前が3文字のもの`;
+const sampleHard = `歴史上の人物
+4本脚のもの
+「あ」で始まる3文字
+冬に使うもの
+水に浮くもの
+光るもの
+電気を使わないもの
+空を飛ぶもの
+音が出るもの
+世界遺産に関係するもの
+漢字で書くと難しいもの
+名前に濁点が入るもの
+日本発祥のもの
+100年以上前からあるもの
+名前に数字が入るもの
+丸くて食べられるもの
+生き物ではないが成長するもの
+見えないけれど存在するもの
+触ると危険なことがあるもの
+一日で変化するもの
+左右対称のもの
+名前に「き」が入るもの
+昔の人が使っていたもの
+季節を感じるもの
+音だけで正体を当てられるもの
+水がなくても生きられるもの
+世界中にあるもの
+日本で見かける赤いもの
+持ち上げるのが大変なもの
+人によって答えが違いそうなもの
+実物を見たことがない人も多いもの`;
+const $=id=>document.getElementById(id);
+let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null;
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function splitTopics(text){return [...new Set(text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(s=>s.replace(/^"|"$/g,'')))];}
+function setSamples(){ $('normalTopics').value=sampleNormal; $('hardTopics').value=sampleHard; }
+// 公開してみんなで遊ぶときは、Firebase ConsoleのWeb設定を下の定数に貼り付けてください。
+const EMBEDDED_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBvdI2bbizAD38r1sJNBe0DT3X0gpk5VY8",
+  authDomain: "bingooooo-55c09.firebaseapp.com",
+  databaseURL: "https://bingooooo-55c09-default-rtdb.firebaseio.com",
+  projectId: "bingooooo-55c09",
+  storageBucket: "bingooooo-55c09.firebasestorage.app",
+  messagingSenderId: "139547993250",
+  appId: "1:139547993250:web:8abf51ea5980afd922a3fb",
+  measurementId: "G-XB8924FDJD"
+};
+function readConfig(){try{return JSON.parse(localStorage.getItem('bingoFirebaseConfig')||'null') || EMBEDDED_FIREBASE_CONFIG}catch{return EMBEDDED_FIREBASE_CONFIG}}
+async function connect(config){
+ if(!config)throw Error('Firebase設定を入力してください');
+ if(!firebase.apps.length)app=firebase.initializeApp(config);else app=firebase.app();
+ await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+ user=await new Promise((resolve,reject)=>{const off=firebase.auth().onAuthStateChanged(u=>{off();if(u)resolve(u);else firebase.auth().signInAnonymously().then(x=>resolve(x.user)).catch(reject)})});
+ db=firebase.database(); return true;
+}
+async function saveConfig(){try{const c=JSON.parse($('firebaseConfig').value);localStorage.setItem('bingoFirebaseConfig',JSON.stringify(c));await connect(c);$('roomStatus').textContent='Firebaseに接続しました。部屋を作成または参加できます。';}catch(e){alert('接続できません：'+e.message)}}
+$('saveConfig').onclick=saveConfig;
+$('forgetConfig').onclick=()=>{localStorage.removeItem('bingoFirebaseConfig');$('firebaseConfig').value='';alert('このブラウザの設定を消しました。')};
+const config=readConfig();if(config){$('firebaseConfig').value=JSON.stringify(config,null,2);connect(config).then(()=>$('roomStatus').textContent='Firebaseに接続しました。').catch(e=>$('roomStatus').textContent='接続エラー：'+e.message)}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeCard(normal,hard,free=false){
+ if(normal.length<16||hard.length< (free?8:9))throw Error('普通のお題は16個以上、難しいお題は9個以上必要です（中央FREEなら難しいお題8個以上）。');
+ const n=shuffle(normal),h=shuffle(hard),cells=[];
+ for(let i=0;i<25;i++){let r=Math.floor(i/5),c=i%5,diag=r===c||r+c===4;
+  if(free&&i===12)cells.push({topic:'FREE',hard:false,open:true,by:'システム'});
+  else cells.push({topic:diag?h.pop():n.pop(),hard:diag,open:false,by:''});
+ }
+ return cells;
+}
+function makeRoomState(name){
+ const normal=splitTopics($('normalTopics').value),hard=splitTopics($('hardTopics').value);
+ if(normal.length<16||hard.length<9)throw Error('普通のお題16個以上、難しいお題9個以上を用意してください。');
+ const pid=uid(),card=makeCard(normal,hard);
+ return {host:pid,normalTopics:normal,hardTopics:hard,players:{[pid]:{id:pid,name:name||'プレイヤー1',joinedAt:Date.now(),card,lines:0}},turnOrder:[pid],turnIndex:0,history:[],claims:{},startedAt:Date.now()};
+}
+async function createRoom(){
+ try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const state=makeRoomState(name);roomId=uid().toUpperCase();roomRef=db.ref('rooms/'+roomId);await roomRef.set(state);isHost=true;localPlayerId=state.host;attachRoom();history.replaceState({},'',location.pathname+'?room='+roomId);renderShare();}catch(e){alert(e.message)}
+}
+async function joinRoom(){
+ try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const urlCode=new URLSearchParams(location.search).get('room');roomId=(urlCode||$('shareUrl').value.match(/[?&]room=([^&]+)/)?.[1]||prompt('部屋コードを入力してください')||'').toUpperCase();if(!roomId)return;roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists())throw Error('部屋が見つかりません。コードを確認してください。');const state=snap.val();const pid=uid();localPlayerId=pid;const normal=state.normalTopics||splitTopics($('normalTopics').value);const hard=state.hardTopics||splitTopics($('hardTopics').value);const card=makeCard(normal,hard);await roomRef.child('players/'+pid).set({id:pid,name,joinedAt:Date.now(),card,lines:0});await roomRef.child('turnOrder').transaction(v=>(v||[]).concat(pid));isHost=false;attachRoom();renderShare();}catch(e){alert(e.message)}
+}
+$('createRoom').onclick=createRoom;$('joinRoom').onclick=joinRoom;
+function renderShare(){$('shareArea').classList.remove('hidden');$('playersArea').classList.remove('hidden');$('shareUrl').value=location.origin+location.pathname+'?room='+roomId;$('roomCodeLabel').textContent='部屋：'+roomId;}
+$('copyUrl').onclick=async()=>{try{await navigator.clipboard.writeText($('shareUrl').value);alert('招待URLをコピーしました。LINEで共有できます。')}catch{ $('shareUrl').select();document.execCommand('copy');alert('URLをコピーしました。')}};
+$('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(roomId);alert('部屋コードをコピーしました。')}catch{prompt('部屋コード',roomId)}};
+function attachRoom(){if(unsub)unsub();const cb=s=>{if(!s.exists()){alert('部屋が終了しました');return}room=s.val();renderAll()};roomRef.on('value',cb);unsub=()=>roomRef.off('value',cb);$('roomStatus').textContent='部屋に接続中です。招待URLをLINEで共有しましょう。';}
+function currentPlayer(){return room?.players?.[localPlayerId]}
+function currentTurnId(){if(!room?.turnOrder?.length)return null;return room.turnOrder[(room.turnIndex||0)%room.turnOrder.length]}
+function countLines(card){let n=0;const lines=[];for(let i=0;i<5;i++){lines.push([0,1,2,3,4].map(c=>i*5+c));lines.push([0,1,2,3,4].map(r=>r*5+i));}lines.push([0,1,2,3,4].map(i=>i*5+i),[0,1,2,3,4].map(i=>i*5+(4-i)));for(const l of lines)if(l.every(i=>card[i]?.open)){n++;}return n}
+function renderAll(){
+ if(!room)return;const me=currentPlayer();$('myName').textContent=me?me.name:'参加者ではありません';$('roomCodeLabel').textContent='部屋：'+roomId;
+ $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}</span>`}).join('');
+ $('turnLabel').textContent='宣言する番：'+(room.players?.[currentTurnId()]?.name||'—');
+ $('declareBtn').disabled=localPlayerId!==currentTurnId();$('wordInput').disabled=localPlayerId!==currentTurnId();
+ const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId];b.onclick=()=>markCell(i);board.appendChild(b)});const lines=countLines(me.card);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';}
+ const active=room.activeClaim?room.claims?.[room.activeClaim]:null;
+ if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを1つクリックしてください。<br><span class="muted">選んだマス：${active.pending[localPlayerId].selected!==-2?'選択済み':'未選択'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent=''}
+ $('noneBtn').disabled=!active||!active.pending?.[localPlayerId];$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
+}
+async function declareWord(){if(!room||localPlayerId!==currentTurnId())return;const word=$('wordInput').value.trim();if(!word)return alert('宣言する単語を入力してください。');const id=uid();const pending={};(room.turnOrder||[]).forEach(pid=>{if(room.players?.[pid])pending[pid]={selected:-2}});const claim={id,word,by:localPlayerId,byName:currentPlayer()?.name,time:Date.now(),pending};await roomRef.child('claims/'+id).set(claim);await roomRef.update({activeClaim:id});$('wordInput').value='';}
+$('declareBtn').onclick=declareWord;$('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')declareWord()});
+async function markCell(i){
+ const active=room?.claims?.[room.activeClaim],me=currentPlayer();if(!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2)return;
+ const cell=me.card[i];if(!cell||cell.open)return;
+ await roomRef.child('players/'+localPlayerId+'/card/'+i).update({open:true,by:active.word});
+ await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:i,topic:cell.topic});
+ await finishIfDone();
+}
+$('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId])return;await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await finishIfDone()};
+async function finishIfDone(){
+ const snap=await roomRef.get();const s=snap.val(),a=s.claims[s.activeClaim];if(Object.values(a.pending||{}).some(x=>x.selected===-2))return;
+ const results=Object.entries(a.pending).map(([pid,x])=>({id:pid,name:s.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected}));
+ const history=[...(s.history||[]),{word:a.word,byName:a.byName,time:a.time,results}];
+ let idx=(s.turnIndex||0)+1;if(idx>=(s.turnOrder||[]).length)idx=0;
+ await roomRef.update({history,turnIndex:idx,activeClaim:null});
+}
+$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value);if(n.length<16||h.length<9)return alert('普通のお題16個以上、難しいお題9個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
+$('sampleBtn').onclick=setSamples;
+$('resetBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!confirm('全員のカードと記録をリセットしますか？'))return;const n=room.normalTopics,h=room.hardTopics;for(const pid of room.turnOrder||[]){await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});};
+$('undoBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!room.history?.length)return alert('取り消せる記録がありません。');if(!confirm('直前の宣言記録を削除します。カードの開封状態は自動では戻りません。続けますか？'))return;await roomRef.update({history:room.history.slice(0,-1)});};
+$('exportBtn').onclick=()=>{if(!room)return alert('先に部屋に参加してください。');const rows=[['単語','宣言者','日時','参加者','開けた要素','マス番号']];(room.history||[]).forEach(h=>(h.results||[]).forEach(x=>rows.push([h.word,h.byName,new Date(h.time).toISOString(),x.name,x.topic,x.index>=0?x.index+1:''])));const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='お題ビンゴ記録.csv';a.click();URL.revokeObjectURL(a.href)};
+setSamples();
+(async()=>{const c=readConfig();const code=new URLSearchParams(location.search).get('room');if(code){roomId=code.toUpperCase();$('roomStatus').textContent='招待URLを検出しました。名前を入力して「この部屋に参加」を押してください。';$('shareArea').classList.remove('hidden');$('shareUrl').value=location.href;}})();
+</script>
+</body>
+</html>
