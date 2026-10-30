@@ -13,7 +13,7 @@ main{max-width:1180px;margin:18px auto;padding:0 14px 40px;display:grid;grid-tem
 .panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 18px #1b37630b;min-width:0}
 h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px}
 label{display:block;font-size:13px;font-weight:700;margin:10px 0 5px}input,textarea,select,button{font:inherit}input,textarea,select{width:100%;padding:10px;border:1px solid #c8d2e1;border-radius:9px;background:#fff;color:var(--ink)}
-textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button{border:0;border-radius:10px;padding:10px 13px;background:#e9eef8;color:#243653;font-weight:700;cursor:pointer}button.primary{background:var(--blue);color:white}button.good{background:#e2f5eb;color:#176848}button.danger{background:#ffeded;color:#a32c35}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#65748a;font-size:12px;line-height:1.6}.status{padding:10px;border-radius:10px;background:#edf3ff;font-size:13px;line-height:1.5;margin:8px 0}.hidden{display:none!important}.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.cell{min-height:78px;padding:7px 4px;border:2px solid #d7e0ed;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.5vw,15px);font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere;position:relative;cursor:pointer}.cell.hard:after{content:"★";position:absolute;right:5px;top:2px;color:#c84d55;font-size:11px}.cell.open{background:#dff5e9;border-color:#38a477;color:#165f45}.cell.selected{background:#dce7ff;border-color:#315cc9;box-shadow:inset 0 0 0 2px #315cc9}.cell.free{background:#fff3cc;border-color:#edc14d}.cell.winline{box-shadow:inset 0 0 0 3px #efb83f}.small{font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf1f8;font-size:12px}.players{display:flex;gap:7px;flex-wrap:wrap}.player{border:1px solid var(--line);padding:8px 10px;border-radius:10px;font-size:13px}.player.active{border-color:var(--blue);background:#edf2ff;font-weight:800}.feed{max-height:280px;overflow:auto}.feeditem{padding:10px 0;border-bottom:1px solid #edf0f5;font-size:13px}.feeditem:last-child{border-bottom:0}.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{font-size:14px;font-weight:800}.callrow{display:grid;grid-template-columns:1fr auto;gap:8px}.footer{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.declared-topic{margin:10px 0;padding:16px;border:2px solid #315cc9;border-radius:14px;background:linear-gradient(135deg,#edf3ff,#fff);text-align:center}.declared-topic .label{font-size:12px;font-weight:800;color:#315cc9;letter-spacing:.08em}.declared-topic .word{font-size:clamp(24px,5vw,38px);font-weight:900;line-height:1.25;overflow-wrap:anywhere;margin-top:5px}.declared-topic .by{font-size:12px;color:#65748a;margin-top:6px}.bingo-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#17213a99;padding:20px;animation:fadein .2s ease}.bingo-card{position:relative;background:#fff;border-radius:24px;padding:34px 28px;text-align:center;box-shadow:0 20px 80px #0005;animation:pop .45s cubic-bezier(.2,1.5,.5,1);max-width:420px;width:100%;overflow:hidden}.bingo-card h2{font-size:clamp(36px,8vw,58px);color:#315cc9;margin:0 0 8px}.bingo-card p{margin:0;font-weight:700}.confetti{position:absolute;top:-20px;width:9px;height:16px;animation:fall 1.8s linear forwards;pointer-events:none}@keyframes pop{from{transform:scale(.5) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}@keyframes fadein{from{opacity:0}to{opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button{border:0;border-radius:10px;padding:10px 13px;background:#e9eef8;color:#243653;font-weight:700;cursor:pointer}button.primary{background:var(--blue);color:white}button.good{background:#e2f5eb;color:#176848}button.danger{background:#ffeded;color:#a32c35}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#65748a;font-size:12px;line-height:1.6}.status{padding:10px;border-radius:10px;background:#edf3ff;font-size:13px;line-height:1.5;margin:8px 0}.hidden{display:none!important}.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0}.cell{min-height:78px;padding:7px 4px;border:2px solid #d7e0ed;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.5vw,15px);font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere;position:relative;cursor:pointer}.cell.hard:after{content:"★";position:absolute;right:5px;top:2px;color:#c84d55;font-size:11px}.cell.open{background:#dff5e9;border-color:#38a477;color:#165f45}.cell.selected{background:#dce7ff;border-color:#315cc9;box-shadow:inset 0 0 0 2px #315cc9}.cell.free{background:#fff3cc;border-color:#edc14d}.cell.winline{box-shadow:inset 0 0 0 3px #efb83f}.small{font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf1f8;font-size:12px}.players{display:flex;gap:7px;flex-wrap:wrap}.player{border:1px solid var(--line);padding:8px 10px;border-radius:10px;font-size:13px}.player{display:inline-flex;flex-direction:column;gap:3px}.player.active{border-color:var(--blue);background:#edf2ff;font-weight:800}.feed{max-height:280px;overflow:auto}.feeditem{padding:10px 0;border-bottom:1px solid #edf0f5;font-size:13px}.feeditem:last-child{border-bottom:0}.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{font-size:14px;font-weight:800}.callrow{display:grid;grid-template-columns:1fr auto;gap:8px}.footer{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.declared-topic{margin:10px 0;padding:16px;border:2px solid #315cc9;border-radius:14px;background:linear-gradient(135deg,#edf3ff,#fff);text-align:center}.declared-topic .label{font-size:12px;font-weight:800;color:#315cc9;letter-spacing:.08em}.declared-topic .word{font-size:clamp(24px,5vw,38px);font-weight:900;line-height:1.25;overflow-wrap:anywhere;margin-top:5px}.declared-topic .by{font-size:12px;color:#65748a;margin-top:6px}.bingo-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#17213a99;padding:20px;animation:fadein .2s ease}.bingo-card{position:relative;background:#fff;border-radius:24px;padding:34px 28px;text-align:center;box-shadow:0 20px 80px #0005;animation:pop .45s cubic-bezier(.2,1.5,.5,1);max-width:420px;width:100%;overflow:hidden}.bingo-card h2{font-size:clamp(36px,8vw,58px);color:#315cc9;margin:0 0 8px}.bingo-card p{margin:0;font-weight:700}.confetti{position:absolute;top:-20px;width:9px;height:16px;animation:fall 1.8s linear forwards;pointer-events:none}@keyframes pop{from{transform:scale(.5) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}@keyframes fadein{from{opacity:0}to{opacity:1}}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
 @media(max-width:850px){main{grid-template-columns:1fr;margin:10px auto;padding:0 8px 24px;gap:10px}.panel{padding:12px;border-radius:13px}.board{gap:4px;margin:10px 0}.cell{min-height:clamp(52px,15vw,78px);padding:4px 1px;border-width:1px;border-radius:8px;font-size:clamp(10px,2.8vw,14px);line-height:1.2;word-break:break-word}.boardtop{align-items:flex-start}header{padding:14px 12px}header p{font-size:13px}h2{font-size:17px}.row{gap:6px}.row button,.callrow button,button{min-height:42px;padding:9px 10px}.callrow{grid-template-columns:minmax(0,1fr) auto;gap:6px}.status{padding:8px;margin:6px 0}.feed{max-height:220px}.setupgrid{grid-template-columns:1fr}textarea{font-size:14px;min-height:120px}input,select{min-height:42px}}
 @media(max-width:420px){.cell{font-size:10px;min-height:54px}.pill{font-size:11px}.board{gap:3px}.row .status{flex:1 1 42%}.callrow button{font-size:13px}}
 </style>
@@ -27,7 +27,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <label for="playerName">あなたの名前</label><input id="playerName" maxlength="20" placeholder="例：あおい">
 <div class="row" style="margin-top:8px"><button class="primary" id="createRoom">新しい部屋を作る</button><button id="joinRoom">この部屋に参加</button></div>
 <div id="shareArea" class="hidden"><label>招待URL（LINEで共有）</label><input id="shareUrl" readonly><div class="row" style="margin-top:7px"><button id="copyUrl">URLをコピー</button><button id="copyCode">部屋コードをコピー</button></div></div>
-<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
+<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><div class="row"><button id="announceResultsBtn" class="primary">結果発表（ホスト）</button></div><div id="resultsPanel" class="feed"></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
 <div class="footer">
 <h2>② お題を編集（ホスト用）</h2>
 <p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は「中央＋両斜め」の9マスに配置します。</p>
@@ -55,7 +55,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <div class="row"><button id="confirmCellBtn" class="primary" disabled>選んだマスを開く（確定）</button><button id="noneBtn">該当マスなし</button></div><div class="row" style="margin-top:6px"><button id="undoBtn">直前の宣言を取り消す（ホスト）</button><button id="deleteRoomBtn" class="danger">部屋を削除する（ホスト）</button></div>
 <h2 style="margin-top:20px">⑤ 宣言・開封の記録</h2>
 <div class="row"><button id="exportBtn">記録をCSV保存</button><button id="resetBtn" class="danger">ゲームをやり直す（ホスト）</button></div>
-<div id="history" class="feed"></div>
+<div id="objectionArea" class="feed"></div><div id="history" class="feed"></div>
 <div class="footer"><h3>遊び方のおすすめ</h3><p class="muted">・「いちご」なら「赤いもの」「甘いもの」など、当てはまる候補が複数あっても開けられるのは1マスだけ。<br>・開けるマスはプレイヤーごとに選びます。同じ単語でも、カードによって開くマスは違ってOK。<br>・同点対策に「先にビンゴした人が勝ち」か「全員のビンゴ数で勝負」を最初に決めておくとスムーズです。</p></div>
 </section>
 </main>
@@ -493,13 +493,15 @@ function makeRoomState(name){
  const normal=splitTopics($('normalTopics').value),hard=splitTopics($('hardTopics').value);
  if(normal.length<16||hard.length<9)throw Error('普通のお題16個以上、難しいお題9個以上を用意してください。');
  const pid=uid(),card=makeCard(normal,hard);
- return {host:pid,normalTopics:normal,hardTopics:hard,players:{[pid]:{id:pid,name:name||'プレイヤー1',joinedAt:Date.now(),card,lines:0}},turnOrder:[pid],turnIndex:0,history:[],claims:{},startedAt:Date.now()};
+ return {host:pid,normalTopics:normal,hardTopics:hard,players:{[pid]:{id:pid,name:name||'プレイヤー1',joinedAt:Date.now(),card,lines:0}},turnOrder:[pid],turnIndex:0,history:[],claims:{},startedAt:Date.now(),firstTurnChosen:false};
 }
 async function createRoom(){
  try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const state=makeRoomState(name);roomId=uid().toUpperCase();roomRef=db.ref('rooms/'+roomId);await roomRef.set(state);isHost=true;localPlayerId=state.host;attachRoom();history.replaceState({},'',location.pathname+'?room='+roomId);renderShare();}catch(e){alert(e.message)}
 }
 async function joinRoom(){
- try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const urlCode=new URLSearchParams(location.search).get('room');roomId=(urlCode||$('shareUrl').value.match(/[?&]room=([^&]+)/)?.[1]||prompt('部屋コードを入力してください')||'').toUpperCase();if(!roomId)return;roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists())throw Error('部屋が見つかりません。コードを確認してください。');const state=snap.val();const pid=uid();localPlayerId=pid;const normal=state.normalTopics||splitTopics($('normalTopics').value);const hard=state.hardTopics||splitTopics($('hardTopics').value);const card=makeCard(normal,hard);await roomRef.child('players/'+pid).set({id:pid,name,joinedAt:Date.now(),card,lines:0});await roomRef.child('turnOrder').transaction(v=>(v||[]).concat(pid));isHost=false;attachRoom();renderShare();}catch(e){alert(e.message)}
+ try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const urlCode=new URLSearchParams(location.search).get('room');roomId=(urlCode||$('shareUrl').value.match(/[?&]room=([^&]+)/)?.[1]||prompt('部屋コードを入力してください')||'').toUpperCase();if(!roomId)return;roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists())throw Error('部屋が見つかりません。コードを確認してください。');const state=snap.val();const pid=uid();localPlayerId=pid;const normal=state.normalTopics||splitTopics($('normalTopics').value);const hard=state.hardTopics||splitTopics($('hardTopics').value);const card=makeCard(normal,hard);await roomRef.child('players/'+pid).set({id:pid,name,joinedAt:Date.now(),card,lines:0});const orderResult=await roomRef.child('turnOrder').transaction(v=>(v||[]).concat(pid));
+ const latest=(await roomRef.get()).val();if(!latest.firstTurnChosen&&(latest.turnOrder||[]).length>=2){const idx=Math.floor(Math.random()*latest.turnOrder.length);await roomRef.update({turnIndex:idx,firstTurnChosen:true});}
+ isHost=false;attachRoom();renderShare();}catch(e){alert(e.message)}
 }
 $('createRoom').onclick=createRoom;$('joinRoom').onclick=joinRoom;
 function renderShare(){$('shareArea').classList.remove('hidden');$('playersArea').classList.remove('hidden');$('shareUrl').value=location.origin+location.pathname+'?room='+roomId;$('roomCodeLabel').textContent='部屋：'+roomId;}
@@ -510,6 +512,16 @@ function currentPlayer(){return room?.players?.[localPlayerId]}
 let lastBingoLines = 0;
 function bingoLines(card){const lines=[];for(let i=0;i<5;i++){lines.push([0,1,2,3,4].map(c=>i*5+c));lines.push([0,1,2,3,4].map(r=>r*5+i));}lines.push([0,1,2,3,4].map(i=>i*5+i),[0,1,2,3,4].map(i=>i*5+(4-i)));return lines;}
 function countLines(card){return bingoLines(card).filter(l=>l.every(i=>card[i]?.open)).length}
+function playerStatus(card){
+ const lines=countLines(card), reachLines=bingoLines(card).filter(l=>l.filter(i=>card[i]?.open).length===4).length;
+ const tags=[];
+ if(lines===0&&reachLines===0) return 'ビンゴなし・リーチなし';
+ if(lines===0){tags.push(reachLines>=3?'トリプルリーチ':reachLines===2?'Wリーチ':'リーチ');}
+ if(lines>0)tags.push(lines+'ビンゴ');
+ if(lines>0&&reachLines>0)tags.push(reachLines>=3?'トリプルリーチ':reachLines===2?'Wリーチ':'リーチ');
+ return tags.join('、');
+}
+
 function isReach(card){return bingoLines(card).some(l=>l.filter(i=>card[i]?.open).length===4)}
 function showBingo(name){const overlay=document.createElement('div');overlay.className='bingo-overlay';overlay.innerHTML=`<div class="bingo-card"><h2>🎉 BINGO! 🎉</h2><p>${esc(name)} がビンゴ！</p><p style="margin-top:12px;font-size:13px;color:#65748a">おめでとう！</p></div>`;for(let i=0;i<44;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.animationDelay=Math.random()*.7+'s';c.style.background=['#315cc9','#f3bd3c','#ed6674','#32a878','#9c72d6'][i%5];overlay.appendChild(c)}document.body.appendChild(overlay);overlay.addEventListener('click',()=>overlay.remove());setTimeout(()=>overlay.remove(),3500)}
 function currentTurnId(){
@@ -528,7 +540,7 @@ function currentTurnId(){
 }
 function renderAll(){
  if(!room)return;const me=currentPlayer();$('myName').textContent=me?me.name:'参加者ではありません';$('roomCodeLabel').textContent='部屋：'+roomId;
- $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}</span>`}).join('');
+ $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';const st=playerStatus(p.card||[]);const kick=(isHost&&id!==room.host)?` <button class="small danger" onclick="kickPlayer('${id}')">キック</button>`:'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}<small>${esc(st)}</small>${kick}</span>`}).join('');
  $('turnLabel').textContent='宣言する番：'+(room.players?.[currentTurnId()]?.name||'—');
  const liveClaim=room.activeClaim?room.claims?.[room.activeClaim]:null;
  const latestHistory=(room.history||[]).slice(-1)[0];
@@ -539,6 +551,18 @@ function renderAll(){
  const active=room.activeClaim?room.claims?.[room.activeClaim]:null;
  if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを選び、「選んだマスを開く（確定）」を押してください。<br><span class="muted">${selectedCellIndex!==null?'選択中：'+esc(me?.card?.[selectedCellIndex]?.topic||''):'まだマスを選んでいません'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent='';selectedCellIndex=null} $('confirmCellBtn').disabled=selectedCellIndex===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;
  $('noneBtn').disabled=!active||!active.pending?.[localPlayerId];$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
+ const last=(room.history||[]).slice(-1)[0];
+ $('objectionArea').innerHTML=last?'<h3>直前の回答への異議申し立て</h3>'+((last.results||[]).filter(x=>x.index>=0).map(x=>{
+  const obj=last.objections?.[x.id];
+  const canObject=localPlayerId!==x.id&&!obj;
+  const votes=obj?.votes||{};
+  const voteButtons=obj&&localPlayerId!==x.id&&!votes[localPlayerId]&&obj.status==='open'?`<button onclick="voteObjection('${last.claimId}','${x.id}',true)">承認</button><button class="danger" onclick="voteObjection('${last.claimId}','${x.id}',false)">却下</button>`:'';
+  return `<div class="feeditem"><b>${esc(x.name)}</b>：${esc(x.topic||'該当なし')} <button ${canObject?'':'disabled'} onclick="raiseObjection('${last.claimId}','${x.id}')">異議</button>${obj?`<div>異議：${esc(obj.reason||'マスの判定について')}（${obj.status==='open'?'投票中':obj.status==='approved'?'承認':'却下'}） ${voteButtons}<div class="muted">承認 ${Object.values(votes).filter(v=>v===true).length} ／ 却下 ${Object.values(votes).filter(v=>v===false).length}</div></div>`:''}</div>`;
+ }).join('')||'<p class="muted">直前の回答でマスを開けた人はいません。</p>'):'';
+ $('announceResultsBtn').style.display=isHost?'inline-block':'none';
+ $('resultsPanel').innerHTML=room.finalResults?'<h3>🏆 結果発表</h3>'+room.finalResults.map((r,i)=>`<div class="feeditem"><b>${i+1}位：${esc(r.name)}</b> — ${r.score}点（ビンゴ ${r.lines}×10点、開封 ${r.opened}点、追加 ${r.extra}点）</div>`).join(''):'';
+
+
 }
 async function declareWord(){if(!room||localPlayerId!==currentTurnId())return;const word=$('wordInput').value.trim();if(!word)return alert('宣言する単語を入力してください。');const id=uid();const pending={};(room.turnOrder||[]).forEach(pid=>{if(room.players?.[pid])pending[pid]={selected:-2}});const claim={id,word,by:localPlayerId,byName:currentPlayer()?.name,time:Date.now(),pending};await roomRef.child('claims/'+id).set(claim);await roomRef.update({activeClaim:id});$('wordInput').value='';}
 $('declareBtn').onclick=declareWord;$('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')declareWord()});
@@ -554,15 +578,15 @@ async function confirmCell(){
  const updatedCard=me.card.map((c,j)=>j===i?{...c,open:true,by:active.word}:c);
  await roomRef.child('players/'+localPlayerId+'/card/'+i).update({open:true,by:active.word});
  if(isReach(updatedCard)&&!me.reachAt)await roomRef.child('players/'+localPlayerId).update({reachAt:active.time||Date.now(),reachClaimId:active.id});
- await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:i,topic:cell.topic});
+ await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:i,topic:cell.topic,linesBefore:countLines(me.card)});
  selectedCellIndex=null;await finishIfDone();
 }
 $('confirmCellBtn').onclick=confirmCell;
 $('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId])return;selectedCellIndex=null;await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await finishIfDone()};
 async function finishIfDone(){
  const snap=await roomRef.get();const s=snap.val(),a=s.claims[s.activeClaim];if(Object.values(a.pending||{}).some(x=>x.selected===-2))return;
- const results=Object.entries(a.pending).map(([pid,x])=>({id:pid,name:s.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected}));
- const history=[...(s.history||[]),{word:a.word,byName:a.byName,time:a.time,results,claimId:a.id,turnIndexBefore:s.turnIndex||0}];
+ const results=Object.entries(a.pending).map(([pid,x])=>({id:pid,name:s.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected,linesBefore:Number(x.linesBefore||0),linesAfter:countLines(s.players?.[pid]?.card||[]),bingoOnOtherTurn:a.by!==pid&&countLines(s.players?.[pid]?.card||[])>Number(x.linesBefore||0)}));
+ const history=[...(s.history||[]),{word:a.word,by:a.by,byName:a.byName,time:a.time,results,claimId:a.id,turnIndexBefore:s.turnIndex||0}];
  const order=(s.turnOrder||[]).filter(pid=>s.players?.[pid]);
  const cards={};for(const pid of order){const ps=(await roomRef.child('players/'+pid+'/card').get()).val();cards[pid]=ps||[];}
  const reachers=order.filter(pid=>isReach(cards[pid]));
@@ -575,9 +599,9 @@ async function finishIfDone(){
  }else{
    for(let step=1;step<=order.length;step++){const candidate=order[((s.turnIndex||0)+step)%order.length];if(candidate&&!isReach(cards[candidate])){turnIndex=(s.turnOrder||[]).indexOf(candidate);break;}}
  }
- await roomRef.update({history,turnIndex,activeClaim:null});
+ await roomRef.update({history,turnIndex,activeClaim:null,finalResults:null});
 }
-$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value);if(n.length<16||h.length<9)return alert('普通のお題16個以上、難しいお題9個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
+$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value);if(n.length<16||h.length<9)return alert('普通のお題16個以上、難しいお題9個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,finalResults:null});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
 $('sampleBtn').onclick=setSamples;
 $('resetBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!confirm('全員のカードと記録をリセットしますか？'))return;const n=room.normalTopics,h=room.hardTopics;for(const pid of room.turnOrder||[]){await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});};
 $('deleteRoomBtn').onclick=async()=>{
@@ -587,6 +611,60 @@ $('deleteRoomBtn').onclick=async()=>{
  try{if(unsub)unsub();await roomRef.remove();room=null;roomRef=null;roomId=null;isHost=false;localPlayerId=null;selectedCellIndex=null;history.replaceState({},'',location.pathname);$('shareArea').classList.add('hidden');$('playersArea').classList.add('hidden');$('board').innerHTML='';$('roomStatus').textContent='部屋を削除しました。新しい部屋を作成できます。';$('myName').textContent='未参加';$('roomCodeLabel').textContent='部屋：—';$('turnLabel').textContent='順番：—';$('bingoCount').textContent='ビンゴ 0ライン';$('openCount').textContent='開けた数 0 / 25';$('history').innerHTML='';alert('部屋を削除しました。');}
  catch(e){alert('部屋を削除できませんでした：'+e.message)}
 };
+
+async function kickPlayer(pid){
+ if(!isHost||pid===room?.host)return;
+ const p=room?.players?.[pid];if(!p)return;
+ if(!confirm(`${p.name} さんを部屋から退出させますか？`))return;
+ await roomRef.child('players/'+pid).remove();
+ await roomRef.child('turnOrder').transaction(v=>(v||[]).filter(id=>id!==pid));
+}
+async function raiseObjection(claimId,pid){
+ if(!room||localPlayerId===pid)return;
+ const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('異議を申し立てられるのは直前の回答だけです。');
+ const current=last.objections?.[pid];if(current)return alert('このマスにはすでに異議申し立てがあります。');
+ const reason=prompt('異議の理由（任意）','判定を確認してください');if(reason===null)return;
+ await roomRef.child('history/'+(room.history.length-1)+'/objections/'+pid).set({by:localPlayerId,byName:currentPlayer()?.name||'参加者',reason,status:'open',votes:{},createdAt:Date.now()});
+}
+async function voteObjection(claimId,pid,approve){
+ const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('直前の回答ではありません。');
+ if(localPlayerId===pid)return alert('異議を申し立てられた本人は投票できません。');
+ const obj=last.objections?.[pid];if(!obj||obj.status!=='open')return;
+ if(obj.votes?.[localPlayerId]!==undefined)return alert('投票済みです。');
+ const votes={...(obj.votes||{}),[localPlayerId]:approve};
+ const eligible=(room.turnOrder||[]).filter(id=>id!==pid&&room.players?.[id]);
+ const yes=eligible.filter(id=>votes[id]===true).length,no=eligible.filter(id=>votes[id]===false).length;
+ let status='open';
+ if(yes>eligible.length/2)status='approved';
+ else if(no>=Math.ceil(eligible.length/2))status='rejected';
+ const updates={votes,status};
+ await roomRef.child('history/'+(room.history.length-1)+'/objections/'+pid).update(updates);
+ if(status==='approved'){
+   const idx=last.results?.findIndex(x=>x.id===pid)??-1;
+   if(idx>=0){const cellIndex=last.results[idx].index;if(cellIndex>=0)await roomRef.child('players/'+pid+'/card/'+cellIndex).update({open:false,by:null});
+     const p=room.players?.[pid];if(p){const card=(p.card||[]).map((c,i)=>i===cellIndex?{...c,open:false,by:null}:c);if(!isReach(card))await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}
+   }
+ }
+}
+async function announceResults(){
+ if(!isHost)return alert('結果発表はホストだけができます。');
+ const scores=(room.turnOrder||[]).filter(id=>room.players?.[id]).map(id=>{
+  const p=room.players[id],card=p.card||[],lines=countLines(card),opened=card.filter(c=>c.open).length;
+  const extra=(room.history||[]).filter(h=>(h.results||[]).some(r=>r.id===id&&r.bingoOnOtherTurn)).length*5;
+  return {id,name:p.name,lines,opened,extra,score:lines*10+opened+extra};
+ }).sort((a,b)=>b.score-a.score||b.lines-a.lines||b.opened-a.opened);
+ await roomRef.update({finalResults:scores,resultsAnnouncedAt:Date.now()});
+}
+function countLinesAtHistory(h,pid){
+ const p=room.players?.[pid];if(!p)return 0;
+ const card=(p.card||[]).map(c=>({...c}));
+ // Approximate whether the just-recorded opening completed a line, using current card minus later openings.
+ const result=(h.results||[]).find(r=>r.id===pid);if(!result||result.index<0)return 0;
+ const index=h.results.indexOf(result);
+ const lines=bingoLines(card);
+ return lines.some(line=>line.includes(result.index)&&line.every(i=>card[i]?.open))?1:0;
+}
+$('announceResultsBtn').onclick=announceResults;
 $('undoBtn').onclick=async()=>{
  if(!isHost)return alert('ホストだけが操作できます。');
  if(!room.history?.length)return alert('取り消せる回答がありません。');
