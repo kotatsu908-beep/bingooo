@@ -557,7 +557,7 @@ function renderAll(){
   const canObject=localPlayerId!==x.id&&!obj;
   const votes=obj?.votes||{};
   const voteButtons=obj&&localPlayerId!==x.id&&!votes[localPlayerId]&&obj.status==='open'?`<button onclick="voteObjection('${last.claimId}','${x.id}',true)">承認</button><button class="danger" onclick="voteObjection('${last.claimId}','${x.id}',false)">却下</button>`:'';
-  return `<div class="feeditem"><b>${esc(x.name)}</b>：${esc(x.topic||'該当なし')} <button ${canObject?'':'disabled'} onclick="raiseObjection('${last.claimId}','${x.id}')">異議</button>${obj?`<div>異議：${esc(obj.reason||'マスの判定について')}（${obj.status==='open'?'投票中':obj.status==='approved'?'承認':'却下'}） ${voteButtons}<div class="muted">承認 ${Object.values(votes).filter(v=>v===true).length} ／ 却下 ${Object.values(votes).filter(v=>v===false).length}</div></div>`:''}</div>`;
+  return `<div class="feeditem"><b>${esc(x.name)}</b>：${esc(x.topic||'該当なし')} <button ${canObject?'':'disabled'} onclick="raiseObjection('${last.claimId}','${x.id}')">異議</button>${obj?`<div>異議：（${obj.status==='open'?'投票中':obj.status==='approved'?'承認':'却下'}） ${voteButtons}<div class="muted">承認 ${Object.values(votes).filter(v=>v===true).length} ／ 却下 ${Object.values(votes).filter(v=>v===false).length}</div></div>`:''}</div>`;
  }).join('')||'<p class="muted">直前の回答でマスを開けた人はいません。</p>'):'';
  $('announceResultsBtn').style.display=isHost?'inline-block':'none';
  $('resultsPanel').innerHTML=room.finalResults?'<h3>🏆 結果発表</h3>'+room.finalResults.map((r,i)=>`<div class="feeditem"><b>${i+1}位：${esc(r.name)}</b> — ${r.score}点（ビンゴ ${r.lines}×10点、開封 ${r.opened}点、追加 ${r.extra}点）</div>`).join(''):'';
@@ -603,7 +603,17 @@ async function finishIfDone(){
 }
 $('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value);if(n.length<16||h.length<9)return alert('普通のお題16個以上、難しいお題9個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,finalResults:null});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
 $('sampleBtn').onclick=setSamples;
-$('resetBtn').onclick=async()=>{if(!isHost)return alert('ホストだけが操作できます。');if(!confirm('全員のカードと記録をリセットしますか？'))return;const n=room.normalTopics,h=room.hardTopics;for(const pid of room.turnOrder||[]){await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});};
+$('resetBtn').onclick=async()=>{
+ if(!isHost)return alert('ホストだけが操作できます。');
+ if(!confirm('全員のカードと記録をリセットし、参加者の順番をシャッフルしますか？'))return;
+ const n=room.normalTopics,h=room.hardTopics;
+ const shuffled=shuffle((room.turnOrder||[]).filter(pid=>room.players?.[pid]));
+ for(const pid of shuffled){
+   await roomRef.child('players/'+pid+'/card').set(makeCard(n,h));
+   await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});
+ }
+ await roomRef.update({turnOrder:shuffled,history:[],claims:{},activeClaim:null,turnIndex:0,firstTurnChosen:true,finalResults:null,hostNotes:{}});
+};
 $('deleteRoomBtn').onclick=async()=>{
  if(!roomRef||!room||!isHost)return alert('部屋を削除できるのはホストだけです。');
  if(!confirm('この部屋と、参加者のカード・宣言記録をすべて削除します。元に戻せません。本当に削除しますか？'))return;
@@ -623,8 +633,7 @@ async function raiseObjection(claimId,pid){
  if(!room||localPlayerId===pid)return;
  const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('異議を申し立てられるのは直前の回答だけです。');
  const current=last.objections?.[pid];if(current)return alert('このマスにはすでに異議申し立てがあります。');
- const reason=prompt('異議の理由（任意）','判定を確認してください');if(reason===null)return;
- await roomRef.child('history/'+(room.history.length-1)+'/objections/'+pid).set({by:localPlayerId,byName:currentPlayer()?.name||'参加者',reason,status:'open',votes:{},createdAt:Date.now()});
+ await roomRef.child('history/'+(room.history.length-1)+'/objections/'+pid).set({by:localPlayerId,byName:currentPlayer()?.name||'参加者',status:'open',votes:{},createdAt:Date.now()});
 }
 async function voteObjection(claimId,pid,approve){
  const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('直前の回答ではありません。');
