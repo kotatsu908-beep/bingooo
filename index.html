@@ -30,11 +30,12 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><div class="row" id="hostTurnControls"><label>制限時間（分）<input id="timeLimitMinutes" type="number" min="1" max="180" value="5"></label><button id="saveTimeLimit">制限時間を設定</button></div><div class="row"><button id="announceResultsBtn" class="primary">結果発表（ホスト）</button></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
 <div class="footer">
 <h2>② お題を編集（ホスト用）</h2>
-<p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は中央以外の斜め8マスに配置し、中央は専用CSVから各プレイヤー別に抽選します。</p>
+<p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は中央以外の両斜め8マスに配置します。</p>
 <div class="row"><button type="button" id="toggleTopicsEditor">お題リストを表示する</button></div><div id="topicsEditorFields" class="hidden"><label for="normalTopics">普通のお題（16個以上）</label><textarea id="normalTopics"></textarea>
-<label for="hardTopics">難しいお題（8個以上・中央以外の斜めマス用）</label><textarea id="hardTopics"></textarea><label for="centerTopics">中央マス専用のお題（center.csv）</label><textarea id="centerTopics" placeholder="中央マス候補を1行に1つ入力"></textarea><label for="centerCsvFile">中央マス専用CSVを読み込む</label><input id="centerCsvFile" type="file" accept=".csv,text/csv"></div>
+<label for="hardTopics">難しいお題（8個以上）</label><textarea id="hardTopics"></textarea>
+<label for="centerCsvFile">中央マス専用CSV（1列・1行に1つ）</label><input id="centerCsvFile" type="file" accept=".csv,text/csv"><div id="centerCsvStatus" class="muted">中央マス用CSVを読み込んでください。中央マスはプレイヤーごとにランダムで決まります。</div></div>
 <div class="row"><button id="sampleBtn">サンプル100題を読み込む</button><button id="applyTopics" class="primary">お題を部屋に反映</button></div>
-<p class="muted">CSVは1列のリストとして読み込みます。1行目が「お題」などの見出しでも、見出しを含めて読み込むので必要なら削除してください。</p>
+<p class="muted">普通・難しいお題は従来どおりリストを使います。中央マス専用CSVは1列形式で読み込み、各プレイヤーの中央に別々のランダムなお題を配置します。</p>
 </div>
 <div class="footer">
 <h3>接続設定（初回のみ）</h3>
@@ -452,11 +453,36 @@ const sampleHard = `歴史上の人物
 災害時に特に重要になるもの
 人生の節目に登場するもの`;
 const $=id=>document.getElementById(id);
-let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null,selectedCellIndex=null;
+let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null,selectedCellIndex=null,centerTopics=[];
+const SESSION_KEY='odaiBingoSessionV1';
+function readSavedSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{return null}}
+function saveSession(){if(!roomId||!localPlayerId)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({roomId,playerId:localPlayerId,selectedCellIndex}))}catch(e){console.warn('復帰情報を保存できません',e)}}
+function clearSavedSession(){try{localStorage.removeItem(SESSION_KEY)}catch{}}
 const uid=()=>Math.random().toString(36).slice(2,10);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function splitTopics(text){return [...new Set(text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(s=>s.replace(/^"|"$/g,'')))];}
 function setSamples(){ $('normalTopics').value=sampleNormal; $('hardTopics').value=sampleHard; }
+function parseCsvTopics(csvText){
+ const rows=[];let row=[],field='',quoted=false;const text=String(csvText||'').replace(/^\uFEFF/,'');
+ for(let i=0;i<text.length;i++){
+  const ch=text[i];
+  if(ch==='"'){
+   if(quoted&&text[i+1]==='"'){field+='"';i++;}
+   else quoted=!quoted;
+  }else if(ch===','&&!quoted){row.push(field);field='';}
+  else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(field);rows.push(row);row=[];field='';}
+  else field+=ch;
+ }
+ if(field.length||row.length){row.push(field);rows.push(row);}
+ let values=rows.map(r=>String(r[0]??'').trim()).filter(Boolean);
+ if(values.length&&/^(お題|中央お題|中央マス|topic|topics)$/i.test(values[0]))values.shift();
+ return [...new Set(values)];
+}
+$('centerCsvFile').addEventListener('change',async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{const buffer=await file.arrayBuffer();let csvText=new TextDecoder('utf-8').decode(buffer);if(csvText.includes('\uFFFD'))csvText=new TextDecoder('shift_jis').decode(buffer);const parsed=parseCsvTopics(csvText);if(!parsed.length)throw Error('CSVからお題を読み取れませんでした。');centerTopics=parsed;$('centerCsvStatus').textContent=`${file.name} を読み込みました（${centerTopics.length}件）。各プレイヤーの中央マスに別々にランダムで1つ選びます。`;}
+ catch(err){centerTopics=[];$('centerCsvStatus').textContent='読み込みエラー：'+err.message;alert(err.message);}
+});
 // 公開してみんなで遊ぶときは、Firebase ConsoleのWeb設定を下の定数に貼り付けてください。
 const EMBEDDED_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBvdI2bbizAD38r1sJNBe0DT3X0gpk5VY8",
@@ -479,36 +505,40 @@ async function connect(config){
 async function saveConfig(){try{const c=JSON.parse($('firebaseConfig').value);localStorage.setItem('bingoFirebaseConfig',JSON.stringify(c));await connect(c);$('roomStatus').textContent='Firebaseに接続しました。部屋を作成または参加できます。';}catch(e){alert('接続できません：'+e.message)}}
 $('saveConfig').onclick=saveConfig;
 $('forgetConfig').onclick=()=>{localStorage.removeItem('bingoFirebaseConfig');$('firebaseConfig').value='';alert('このブラウザの設定を消しました。')};
-const config=readConfig();if(config){$('firebaseConfig').value=JSON.stringify(config,null,2);connect(config).then(()=>$('roomStatus').textContent='Firebaseに接続しました。').catch(e=>$('roomStatus').textContent='接続エラー：'+e.message)}
+async function resumeSavedGame(){const saved=readSavedSession();if(!saved?.roomId||!saved?.playerId||!db)return;const urlRoom=(new URLSearchParams(location.search).get('room')||'').toUpperCase();if(urlRoom&&urlRoom!==String(saved.roomId).toUpperCase())return;try{roomId=String(saved.roomId).toUpperCase();roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists()||!snap.val()?.players?.[saved.playerId]){clearSavedSession();$('roomStatus').textContent='前回の部屋・参加情報が見つかりません。招待URLから参加してください。';return;}localPlayerId=saved.playerId;isHost=snap.val().host===localPlayerId;selectedCellIndex=Number.isInteger(saved.selectedCellIndex)?saved.selectedCellIndex:null;attachRoom();renderShare();if(!urlRoom)history.replaceState({},'',location.pathname+'?room='+roomId);$('roomStatus').textContent='前回のゲームに復帰しました。';}catch(e){$('roomStatus').textContent='復帰できませんでした：'+e.message}}
+const config=readConfig();if(config){$('firebaseConfig').value=JSON.stringify(config,null,2);connect(config).then(async()=>{ $('roomStatus').textContent='Firebaseに接続しました。'; await resumeSavedGame();}).catch(e=>$('roomStatus').textContent='接続エラー：'+e.message)}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function makeCard(normal,hard,centerTopics){
- if(normal.length<16||hard.length<8||!centerTopics||centerTopics.length<1)throw Error('普通のお題16個以上、難しいお題8個以上、中央専用のお題1個以上が必要です。');
- const n=shuffle(normal),h=shuffle(hard),cells=[];
- for(let i=0;i<25;i++){let r=Math.floor(i/5),c=i%5,diag=r===c||r+c===4;
-  if(i===12){const pool=centerTopics;cells.push({topic:pool[Math.floor(Math.random()*pool.length)],hard:false,open:false,by:'',isCenter:true});}
+function makeCard(normal,hard,center=[]){
+ const hasCenter=Array.isArray(center)&&center.length>0;
+ if(normal.length<16||hard.length<(hasCenter?8:9))throw Error('普通のお題は16個以上、難しいお題は'+(hasCenter?'8個以上':'9個以上')+'必要です。');
+ const n=shuffle(normal),h=shuffle(hard),c=hasCenter?shuffle(center):[],cells=[];
+ for(let i=0;i<25;i++){
+  const r=Math.floor(i/5),col=i%5,diag=r===col||r+col===4;
+  if(hasCenter&&i===12)cells.push({topic:c[Math.floor(Math.random()*c.length)],hard:false,center:true,open:false,by:''});
   else cells.push({topic:diag?h.pop():n.pop(),hard:diag,open:false,by:''});
  }
  return cells;
 }
 function makeRoomState(name){
- const normal=splitTopics($('normalTopics').value),hard=splitTopics($('hardTopics').value),center=splitTopics($('centerTopics').value);
- if(normal.length<16||hard.length<8||center.length<1)throw Error('普通のお題16個以上、難しいお題8個以上、中央専用のお題1個以上を用意してください。');
+ const normal=splitTopics($('normalTopics').value),hard=splitTopics($('hardTopics').value),center=[...centerTopics];
+ if(normal.length<16||hard.length<8)throw Error('普通のお題16個以上、難しいお題8個以上を用意してください。');
+ if(!center.length)throw Error('中央マス専用CSVを先に読み込んでください。');
  const pid=uid(),card=makeCard(normal,hard,center);
- return {host:pid,timeLimitMinutes:5,normalTopics:normal,hardTopics:hard,centerTopics:center,players:{[pid]:{id:pid,name:name||'プレイヤー1',joinedAt:Date.now(),card,lines:0}},turnOrder:[pid],turnIndex:0,history:[],claims:{},startedAt:Date.now(),firstTurnChosen:false};
+ return {host:pid,timeLimitMinutes:5,normalTopics:normal,hardTopics:hard,centerTopics:center,players:{[pid]:{id:pid,name:name||'プレイヤー1',joinedAt:Date.now(),card,statusCard:card,lines:0}},turnOrder:[pid],turnIndex:0,declarationCounts:{[pid]:0},history:[],claims:{},startedAt:Date.now(),firstTurnChosen:false};
 }
 async function createRoom(){
- try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const state=makeRoomState(name);roomId=uid().toUpperCase();roomRef=db.ref('rooms/'+roomId);await roomRef.set(state);isHost=true;localPlayerId=state.host;attachRoom();history.replaceState({},'',location.pathname+'?room='+roomId);renderShare();}catch(e){alert(e.message)}
+ try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const state=makeRoomState(name);roomId=uid().toUpperCase();roomRef=db.ref('rooms/'+roomId);await roomRef.set(state);isHost=true;localPlayerId=state.host;selectedCellIndex=null;saveSession();attachRoom();history.replaceState({},'',location.pathname+'?room='+roomId);renderShare();}catch(e){alert(e.message)}
 }
 async function joinRoom(){
- try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const urlCode=new URLSearchParams(location.search).get('room');roomId=(urlCode||$('shareUrl').value.match(/[?&]room=([^&]+)/)?.[1]||prompt('部屋コードを入力してください')||'').toUpperCase();if(!roomId)return;roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists())throw Error('部屋が見つかりません。コードを確認してください。');const state=snap.val();const pid=uid();localPlayerId=pid;const normal=state.normalTopics||splitTopics($('normalTopics').value);const hard=state.hardTopics||splitTopics($('hardTopics').value);const center=state.centerTopics||splitTopics($('centerTopics').value);const card=makeCard(normal,hard,center);await roomRef.child('players/'+pid).set({id:pid,name,joinedAt:Date.now(),card,lines:0});const orderResult=await roomRef.child('turnOrder').transaction(v=>(v||[]).concat(pid));
- const latest=(await roomRef.get()).val();if(!latest.firstTurnChosen&&(latest.turnOrder||[]).length>=2){const idx=Math.floor(Math.random()*latest.turnOrder.length);await roomRef.update({turnIndex:idx,firstTurnChosen:true});}
- isHost=false;attachRoom();renderShare();}catch(e){alert(e.message)}
+ try{if(!db)await connect(readConfig());const name=$('playerName').value.trim()||'プレイヤー';const urlCode=new URLSearchParams(location.search).get('room');roomId=(urlCode||$('shareUrl').value.match(/[?&]room=([^&]+)/)?.[1]||prompt('部屋コードを入力してください')||'').toUpperCase();if(!roomId)return;roomRef=db.ref('rooms/'+roomId);const snap=await roomRef.get();if(!snap.exists())throw Error('部屋が見つかりません。コードを確認してください。');const state=snap.val();const saved=readSavedSession();if(saved&&saved.roomId===roomId&&state.players?.[saved.playerId]){localPlayerId=saved.playerId;isHost=state.host===localPlayerId;selectedCellIndex=Number.isInteger(saved.selectedCellIndex)?saved.selectedCellIndex:null;attachRoom();renderShare();$('roomStatus').textContent='前回の参加情報を使ってゲームに復帰しました。';return;}const pid=uid();localPlayerId=pid;const normal=state.normalTopics||splitTopics($('normalTopics').value);const hard=state.hardTopics||splitTopics($('hardTopics').value);const center=Array.isArray(state.centerTopics)?state.centerTopics:[];const card=makeCard(normal,hard,center);await roomRef.child('players/'+pid).set({id:pid,name,joinedAt:Date.now(),card,statusCard:card,lines:0});const orderResult=await roomRef.child('turnOrder').transaction(v=>(v||[]).concat(pid));
+ const latest=(await roomRef.get()).val();if(!latest.firstTurnChosen&&(latest.turnOrder||[]).length>=2){const idx=Math.floor(Math.random()*latest.turnOrder.length);await roomRef.update({turnIndex:idx,firstTurnChosen:true,declarationCounts:latest.declarationCounts||Object.fromEntries((latest.turnOrder||[]).map(id=>[id,0]))});}
+ isHost=false;selectedCellIndex=null;saveSession();attachRoom();renderShare();}catch(e){alert(e.message)}
 }
 $('createRoom').onclick=createRoom;$('joinRoom').onclick=joinRoom;
 function renderShare(){$('shareArea').classList.remove('hidden');$('playersArea').classList.remove('hidden');$('shareUrl').value=location.origin+location.pathname+'?room='+roomId;$('roomCodeLabel').textContent='部屋：'+roomId;}
 $('copyUrl').onclick=async()=>{try{await navigator.clipboard.writeText($('shareUrl').value);alert('招待URLをコピーしました。LINEで共有できます。')}catch{ $('shareUrl').select();document.execCommand('copy');alert('URLをコピーしました。')}};
 $('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(roomId);alert('部屋コードをコピーしました。')}catch{prompt('部屋コード',roomId)}};
-function attachRoom(){if(unsub)unsub();const cb=s=>{if(!s.exists()){alert('部屋が終了しました');return}room=s.val();renderAll()};roomRef.on('value',cb);unsub=()=>roomRef.off('value',cb);$('roomStatus').textContent='部屋に接続中です。招待URLをLINEで共有しましょう。';}
+function attachRoom(){if(unsub)unsub();const cb=s=>{if(!s.exists()){clearSavedSession();alert('部屋が終了しました');return}room=s.val();Object.values(room.players||{}).forEach(p=>{if(!p.statusCard)p.statusCard=p.card||[];});const saved=readSavedSession();if(saved&&saved.roomId===roomId&&saved.playerId===localPlayerId&&Number.isInteger(saved.selectedCellIndex))selectedCellIndex=saved.selectedCellIndex; if(selectedCellIndex!==null&&(!room.players?.[localPlayerId]?.card?.[selectedCellIndex]||room.players[localPlayerId].card[selectedCellIndex].open))selectedCellIndex=null;saveSession();centerTopics=Array.isArray(room.centerTopics)?room.centerTopics:[];if(!$('normalTopics').value&&room.normalTopics)$('normalTopics').value=room.normalTopics.join('\n');if(!$('hardTopics').value&&room.hardTopics)$('hardTopics').value=room.hardTopics.join('\n');if($('centerCsvStatus'))$('centerCsvStatus').textContent=centerTopics.length?'部屋に中央マス用お題を登録済み（'+centerTopics.length+'件）。':'この部屋は旧形式です。中央CSVを読み込んでからお題を反映してください。';renderAll()};roomRef.on('value',cb);unsub=()=>roomRef.off('value',cb);$('roomStatus').textContent='部屋に接続中です。招待URLをLINEで共有しましょう。';}
 function currentPlayer(){return room?.players?.[localPlayerId]}
 let lastBingoLines = 0;
 function bingoLines(card){const lines=[];for(let i=0;i<5;i++){lines.push([0,1,2,3,4].map(c=>i*5+c));lines.push([0,1,2,3,4].map(r=>r*5+i));}lines.push([0,1,2,3,4].map(i=>i*5+i),[0,1,2,3,4].map(i=>i*5+(4-i)));return lines;}
@@ -530,30 +560,36 @@ function currentTurnId(){
  if(room?.forcedTurn&&room.players?.[room.forcedTurn])return room.forcedTurn;
  if(!room?.turnOrder?.length)return null;
  const order=room.turnOrder.filter(id=>room.players?.[id]);if(!order.length)return null;
- const start=(room.turnIndex||0)%order.length;
- const cyclic=order.map((id,i)=>({id,rank:(i-start+order.length)%order.length}));
- cyclic.sort((a,b)=>{
-   const ca=room.players[a.id].card||[],cb=room.players[b.id].card||[];
-   return countLines(ca)-countLines(cb)||reachLineCount(ca)-reachLineCount(cb)||a.rank-b.rank;
- });
- return cyclic[0]?.id||null;
+ return order[(room.turnIndex||0)%order.length]||null;
 }
+function getDeclarationCounts(){
+ const counts={...(room?.declarationCounts||{})};
+ (room?.turnOrder||[]).forEach(id=>{if(counts[id]===undefined)counts[id]=0;});
+ return counts;
+}
+function chooseNextDeclarer(order,counts){
+ if(!order.length)return null;
+ const min=Math.min(...order.map(id=>Number(counts[id]||0)));
+ const candidates=order.filter(id=>Number(counts[id]||0)===min);
+ return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
 function renderAll(){
  if(!room)return;const me=currentPlayer();$('myName').textContent=me?me.name:'参加者ではありません';$('roomCodeLabel').textContent='部屋：'+roomId;
- $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';const st=playerStatus(p.card||[]);const kick=(isHost&&id!==room.host)?` <button class="small danger" onclick="kickPlayer('${id}')">キック</button>`:'';const force=(isHost)?` <button class="small" onclick="forceNextTurn('${id}')">次の宣言者にする</button>`:'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}<small>${esc(st)}</small>${force}${kick}</span>`}).join('');
- $('turnLabel').textContent='宣言する番：'+(room.players?.[currentTurnId()]?.name||'—');
+ $('players').innerHTML=(room.turnOrder||[]).map((id,i)=>{const p=room.players?.[id];if(!p)return'';const displayCard=p.statusCard||p.card||[];const st=playerStatus(displayCard);const kick=(isHost&&id!==room.host)?` <button class="small danger" onclick="kickPlayer('${id}')">キック</button>`:'';const force=(isHost)?` <button class="small" onclick="forceNextTurn('${id}')">次の宣言者にする</button>`:'';return `<span class="player ${id===currentTurnId()?'active':''}">${i+1}. ${esc(p.name)}${id===localPlayerId?'（あなた）':''}${id===room.host?' 👑':''}<small>${esc(st)}</small>${force}${kick}</span>`}).join('');
+ $('turnLabel').textContent='次の宣言者：'+(room.players?.[currentTurnId()]?.name||'—');
  const liveClaim=room.activeClaim?room.claims?.[room.activeClaim]:null;
  if($('hostTurnControls')){$('hostTurnControls').style.display=isHost?'flex':'none';if(isHost&&$('timeLimitMinutes'))$('timeLimitMinutes').value=room.timeLimitMinutes||5;}
- if($('claimTimer')){if(liveClaim?.deadline){const remain=Math.max(0,Math.ceil((liveClaim.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(remain/60)+'分'+(remain%60)+'秒'+(remain===0?'（時間切れ・自動で該当なし）':'');}else $('claimTimer').textContent='回答受付中の制限時間：宣言待ち';}
- const pendingClaim=room.activeClaim?room.claims?.[room.activeClaim]:null; if($('claimProgress')){if(pendingClaim){const waiting=Object.entries(pendingClaim.pending||{}).filter(([id,v])=>v.selected===-2).map(([id])=>room.players?.[id]?.name||'退出者');$('claimProgress').textContent=waiting.length?'回答待ち：'+waiting.join('、'):'全員の回答が完了しました';}else $('claimProgress').textContent='回答状況：宣言待ち';}
+ if($('claimTimer')){if(liveClaim?.phase==='objection'&&liveClaim.objectionDeadline){const remain=Math.max(0,Math.ceil((liveClaim.objectionDeadline-Date.now())/1000));$('claimTimer').textContent='異議申し立て時間：残り '+Math.floor(remain/60)+'分'+(remain%60)+'秒';}else if(liveClaim?.deadline&&liveClaim.phase!=='objection'){const remain=Math.max(0,Math.ceil((liveClaim.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(remain/60)+'分'+(remain%60)+'秒'+(remain===0?'（時間切れ・自動で該当なし）':'');}else $('claimTimer').textContent='回答受付中の制限時間：宣言待ち';}
+ const pendingClaim=room.activeClaim?room.claims?.[room.activeClaim]:null; if($('claimProgress')){if(pendingClaim){const waiting=Object.entries(pendingClaim.pending||{}).filter(([id,v])=>v.selected===-2).map(([id])=>room.players?.[id]?.name||'退出者');$('claimProgress').textContent=waiting.length?'回答待ち：'+waiting.join('、'):(pendingClaim.phase==='objection'?'全員回答済み・異議申し立て受付中':'全員の回答が完了しました');}else $('claimProgress').textContent='回答状況：宣言待ち';}
  const latestHistory=(room.history||[]).slice(-1)[0];
  $('declaredWord').textContent=liveClaim?.word||latestHistory?.word||'まだ宣言はありません';
- $('declaredBy').textContent=liveClaim?('宣言者：'+(liveClaim.byName||'—')):(latestHistory?('直近の宣言者：'+(latestHistory.byName||'—')):'ゲーム開始を待っています');
- $('declareBtn').disabled=localPlayerId!==currentTurnId();$('wordInput').disabled=localPlayerId!==currentTurnId();
- const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'')+(selectedCellIndex===i?' selected':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId]||room.claims[room.activeClaim].pending[localPlayerId].selected!==-2;b.onclick=()=>markCell(i);board.appendChild(b)});const lines=countLines(me.card);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';$('topPlayerStatus').textContent=playerStatus(me.card)+' ／ ビンゴ '+lines+'ライン ／ 開封 '+me.card.filter(c=>c.open).length+'/25'; $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>'; const finalMe=(room.finalResults||[]).find(r=>r.id===localPlayerId); const openedNow=me.card.filter(c=>c.open).length; $('myScore').textContent='現在の得点：'+(finalMe?finalMe.score:(lines*10+openedNow))+'点'+(finalMe?'（結果発表後の確定点）':'（ビンゴ10点/ライン＋開封マス数。追加点は結果発表後に確定）');if(lines>lastBingoLines)showBingo(me.name);lastBingoLines=lines;}
+ $('declaredBy').textContent=liveClaim?('宣言者：'+(liveClaim.byName||'—')+(liveClaim.phase==='objection'?' ／ 異議申し立て受付中':'') ):(latestHistory?('直近の宣言者：'+(latestHistory.byName||'—')+' ／ 次の宣言者：'+(room.players?.[currentTurnId()]?.name||'—')):'ゲーム開始を待っています');
+ $('declareBtn').disabled=localPlayerId!==currentTurnId()||!!room.activeClaim;$('wordInput').disabled=localPlayerId!==currentTurnId()||!!room.activeClaim;
+ const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'')+(selectedCellIndex===i?' selected':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId]||room.claims[room.activeClaim].pending[localPlayerId].selected!==-2||room.claims[room.activeClaim].phase!=='answering';b.onclick=()=>markCell(i);board.appendChild(b)});const shownCard=me.statusCard||me.card;const lines=countLines(shownCard);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';$('topPlayerStatus').textContent=playerStatus(shownCard)+' ／ ビンゴ '+lines+'ライン ／ 開封 '+me.card.filter(c=>c.open).length+'/25'; $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.statusCard||p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>'; const finalMe=(room.finalResults||[]).find(r=>r.id===localPlayerId); const openedNow=me.card.filter(c=>c.open).length; $('myScore').textContent='現在の得点：'+(finalMe?finalMe.score:(lines*10+openedNow))+'点'+(finalMe?'（結果発表後の確定点）':'（ビンゴ10点/ライン＋開封マス数。追加点は結果発表後に確定）');if(lines>lastBingoLines)showBingo(me.name);lastBingoLines=lines;}
  const active=room.activeClaim?room.claims?.[room.activeClaim]:null;
  if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを選び、「選んだマスを開く（確定）」を押してください。<br><span class="muted">${selectedCellIndex!==null?'選択中：'+esc(me?.card?.[selectedCellIndex]?.topic||''):'まだマスを選んでいません'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent='';selectedCellIndex=null} $('confirmCellBtn').disabled=selectedCellIndex===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;
- $('noneBtn').disabled=!active||!active.pending?.[localPlayerId];$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
+ $('noneBtn').disabled=!active||active.phase!=='answering'||!active.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
  const last=(room.history||[]).slice(-1)[0];
  $('topObjectionArea').innerHTML=last?'<h3>直前の回答への異議申し立て</h3>'+((last.results||[]).filter(x=>x.index>=0).map(x=>{
   const obj=last.objections?.[x.id];
@@ -562,51 +598,67 @@ function renderAll(){
   const voteButtons=obj&&localPlayerId!==x.id&&!votes[localPlayerId]&&obj.status==='open'?`<button onclick="voteObjection('${last.claimId}','${x.id}',true)">異議を承認（マスをもどす）</button><button class="danger" onclick="voteObjection('${last.claimId}','${x.id}',false)">異議を却下</button>`:'';
   return `<div class="feeditem"><b>${esc(x.name)}</b>：${esc(x.topic||'該当なし')} <button ${canObject?'':'disabled'} onclick="raiseObjection('${last.claimId}','${x.id}')">異議申し立て</button>${obj?`<div>異議：（${obj.status==='open'?'投票中':obj.status==='approved'?'承認':'却下'}） ${voteButtons}<div class="muted">承認 ${Object.values(votes).filter(v=>v===true).length} ／ 却下 ${Object.values(votes).filter(v=>v===false).length}</div></div>`:''}</div>`;
  }).join('')||'<p class="muted">直前の回答でマスを開けた人はいません。</p>'):'';
- $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>';
+ $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.statusCard||p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>';
  if(!me){$('topPlayerStatus').textContent=isHost?'司会者モード：参加者の状況は参加者一覧で確認できます':'参加者情報を読み込み中';$('myScore').textContent=isHost?'司会者は得点対象外です':'現在の得点：—';}
  $('announceResultsBtn').style.display=isHost?'inline-block':'none';
  $('resultsPanel').innerHTML=room.finalResults?'<h3>🏆 結果発表</h3>'+room.finalResults.map((r,i)=>`<div class="feeditem"><b>${i+1}位：${esc(r.name)}</b> — ${r.score}点（ビンゴ ${r.lines}×10点、開封 ${r.opened}点、追加 ${r.extra}点）</div>`).join(''):'';
 
 
 }
-async function declareWord(){if(!room||localPlayerId!==currentTurnId())return;const word=$('wordInput').value.trim();if(!word)return alert('宣言する単語を入力してください。');const id=uid();const pending={};(room.turnOrder||[]).forEach(pid=>{if(room.players?.[pid])pending[pid]={selected:-2}});const now=Date.now();const claim={id,word,by:localPlayerId,byName:currentPlayer()?.name,time:now,deadline:now+Number(room.timeLimitMinutes||5)*60000,pending};await roomRef.child('claims/'+id).set(claim);await roomRef.update({activeClaim:id});$('wordInput').value='';}
+async function declareWord(){if(!room||localPlayerId!==currentTurnId())return;const word=$('wordInput').value.trim();if(!word)return alert('宣言する単語を入力してください。');const id=uid();const pending={};(room.turnOrder||[]).forEach(pid=>{if(room.players?.[pid])pending[pid]={selected:-2}});const now=Date.now();const claim={id,word,by:localPlayerId,byName:currentPlayer()?.name,time:now,phase:'answering',deadline:now+Number(room.timeLimitMinutes||5)*60000,pending};await roomRef.child('claims/'+id).set(claim);await roomRef.update({activeClaim:id});$('wordInput').value='';}
 $('declareBtn').onclick=declareWord;$('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')declareWord()});
 function markCell(i){
- const active=room?.claims?.[room.activeClaim],me=currentPlayer();if(!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2)return;
+ const active=room?.claims?.[room.activeClaim],me=currentPlayer();if(!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2||active.phase!=='answering')return;
  const cell=me?.card?.[i];if(!cell||cell.open)return;
- selectedCellIndex=i;renderAll();
+ if(active.by===localPlayerId&&isReach(me.card)){const test=me.card.map((c,j)=>j===i?{...c,open:true}:c);if(countLines(test)>countLines(me.card)){alert('リーチ中は、自分の宣言でビンゴになるマスを開けられません。ほかのマスを選んでください。');return;}}
+ selectedCellIndex=i;saveSession();renderAll();
 }
 async function confirmCell(){
  const i=selectedCellIndex,active=room?.claims?.[room.activeClaim],me=currentPlayer();
- if(i===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2)return;
- const cell=me?.card?.[i];if(!cell||cell.open){selectedCellIndex=null;renderAll();return;}
+ if(i===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2||active.phase!=='answering')return;
+ const cell=me?.card?.[i];if(!cell||cell.open){selectedCellIndex=null;saveSession();renderAll();return;}
  const updatedCard=me.card.map((c,j)=>j===i?{...c,open:true,by:active.word}:c);
+ if(active.by===localPlayerId&&isReach(me.card)&&countLines(updatedCard)>countLines(me.card)){alert('リーチ中は自分の宣言でビンゴになるマスを開けられません。');return;}
  await roomRef.child('players/'+localPlayerId+'/card/'+i).update({open:true,by:active.word});
  if(isReach(updatedCard)&&!me.reachAt)await roomRef.child('players/'+localPlayerId).update({reachAt:active.time||Date.now(),reachClaimId:active.id});
  await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:i,topic:cell.topic,linesBefore:countLines(me.card)});
- selectedCellIndex=null;await extendClaimTime();await finishIfDone();
+ selectedCellIndex=null;saveSession();await finishIfDone();
 }
 $('confirmCellBtn').onclick=confirmCell;
-$('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId])return;selectedCellIndex=null;await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await extendClaimTime();await finishIfDone()};
+$('noneBtn').onclick=async()=>{const active=room?.claims?.[room.activeClaim];if(!active?.pending?.[localPlayerId]||active.phase!=='answering'||active.pending[localPlayerId].selected!==-2)return;selectedCellIndex=null;saveSession();await roomRef.child('claims/'+room.activeClaim+'/pending/'+localPlayerId).update({selected:-1,topic:'該当なし'});await finishIfDone()};
 async function finishIfDone(){
- const snap=await roomRef.get();const s=snap.val(),a=s.claims[s.activeClaim];if(Object.values(a.pending||{}).some(x=>x.selected===-2))return;
- const results=Object.entries(a.pending).map(([pid,x])=>({id:pid,name:s.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected,linesBefore:Number(x.linesBefore||0),linesAfter:countLines(s.players?.[pid]?.card||[]),bingoOnOtherTurn:a.by!==pid&&countLines(s.players?.[pid]?.card||[])>Number(x.linesBefore||0)}));
- const history=[...(s.history||[]),{word:a.word,by:a.by,byName:a.byName,time:a.time,results,claimId:a.id,turnIndexBefore:s.turnIndex||0}];
- const order=(s.turnOrder||[]).filter(pid=>s.players?.[pid]);
- const cards={};for(const pid of order){const ps=(await roomRef.child('players/'+pid+'/card').get()).val();cards[pid]=ps||[];}
- const speakerIndex=order.indexOf(a.by);const turnIndex=order.length?((speakerIndex>=0?speakerIndex:(s.turnIndex||0))+1)%order.length:(s.turnIndex||0);
- await roomRef.update({history,turnIndex,activeClaim:null,finalResults:null,forcedTurn:null});
+ const snap=await roomRef.get();const s=snap.val(),claimId=s?.activeClaim,a=s?.claims?.[claimId];if(!a||a.phase!=='answering')return;
+ if(Object.values(a.pending||{}).some(x=>x.selected===-2))return;
+ const phaseRef=roomRef.child('claims/'+claimId+'/phase');
+ const phaseTx=await phaseRef.transaction(v=>v==='answering'?'objection':undefined);
+ if(!phaseTx.committed||phaseTx.snapshot.val()!=='objection')return;
+ const objectionDeadline=Date.now()+120000;
+ await roomRef.child('claims/'+claimId+'/objectionDeadline').set(objectionDeadline);
+ const latest=await roomRef.get();const state=latest.val(),active=state.claims[claimId];
+ const results=Object.entries(active.pending||{}).map(([pid,x])=>({id:pid,name:state.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected,linesBefore:Number(x.linesBefore||0),linesAfter:countLines(state.players?.[pid]?.card||[]),bingoOnOtherTurn:active.by!==pid&&countLines(state.players?.[pid]?.card||[])>Number(x.linesBefore||0)}));
+ const histRef=roomRef.child('history');
+ await histRef.transaction(old=>{const arr=old||[];if(arr.some(h=>h.claimId===claimId))return arr;arr.push({word:active.word,by:active.by,byName:active.byName,time:active.time,results,claimId,turnIndexBefore:state.turnIndex||0});return arr;});
 }
-async function extendClaimTime(){const ref=roomRef.child('claims/'+room.activeClaim+'/deadline');await ref.transaction(v=>v?Number(v)+60000:v);}
+async function finalizeAfterObjection(){
+ const snap=await roomRef.get();const s=snap.val(),claimId=s?.activeClaim,a=s?.claims?.[claimId];
+ if(!a||a.phase!=='objection'||Date.now()<Number(a.objectionDeadline||Infinity))return;
+ const tx=await roomRef.child('claims/'+claimId+'/phase').transaction(v=>v==='objection'?'finalizing':undefined);
+ if(!tx.committed||tx.snapshot.val()!=='finalizing')return;
+ const state=(await roomRef.get()).val();const order=(state.turnOrder||[]).filter(pid=>state.players?.[pid]);
+ const counts={...(state.declarationCounts||{})};order.forEach(pid=>{counts[pid]=Number(counts[pid]||0)});counts[a.by]=Number(counts[a.by]||0)+1;
+ const next=chooseNextDeclarer(order,counts);const nextIndex=Math.max(0,order.indexOf(next));
+ const updates={};for(const pid of order){const card=(state.players[pid].card||[]);updates['players/'+pid+'/statusCard']=card;}
+ updates.declarationCounts=counts;updates.turnIndex=nextIndex;updates.activeClaim=null;updates.forcedTurn=null;updates.finalResults=null;
+ await roomRef.update(updates);
+}
 async function forceNextTurn(pid){if(!isHost)return;const order=(room.turnOrder||[]).filter(id=>room.players?.[id]);const idx=order.indexOf(pid);if(idx<0)return;await roomRef.update({turnIndex:idx,forcedTurn:pid});}
 $('saveTimeLimit')?.addEventListener('click',async()=>{if(!isHost)return;const n=Math.max(1,Math.min(180,Number($('timeLimitMinutes').value)||5));await roomRef.update({timeLimitMinutes:n});if(room.activeClaim){await roomRef.child('claims/'+room.activeClaim+'/deadline').set(Date.now()+n*60000);}alert('制限時間を'+n+'分に設定しました。');});
 let timeoutSubmitting=false;
 async function autoSubmitOnTimeout(){const a=room?.claims?.[room.activeClaim];if(!a||!a.pending?.[localPlayerId]||a.pending[localPlayerId].selected!==-2||Date.now()<Number(a.deadline||Infinity)||timeoutSubmitting)return;timeoutSubmitting=true;try{await roomRef.child('claims/'+a.id+'/pending/'+localPlayerId).update({selected:-1,topic:'時間切れ（該当なし）',timedOut:true});await finishIfDone();}finally{timeoutSubmitting=false;}}
-setInterval(()=>{if(room?.activeClaim){renderTimerOnly();autoSubmitOnTimeout();}},1000);
-function renderTimerOnly(){const a=room?.claims?.[room.activeClaim];if(!$('claimTimer'))return;if(!a?.deadline){$('claimTimer').textContent='回答受付中の制限時間：—';return;}const sec=Math.max(0,Math.ceil((a.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(sec/60)+'分'+(sec%60)+'秒'+(sec===0?'（時間切れ・自動で該当なし）':'');}
-$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value),c=splitTopics($('centerTopics').value);if(n.length<16||h.length<8||c.length<1)return alert('普通16個以上・難しい8個以上・中央専用1個以上必要です。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,centerTopics:c,finalResults:null});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];await roomRef.child('players/'+pid+'/card').set(makeCard(n,h,c));await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
+setInterval(()=>{if(room?.activeClaim){renderTimerOnly();if(room.claims?.[room.activeClaim]?.phase==='objection')finalizeAfterObjection();else autoSubmitOnTimeout();}},1000);
+function renderTimerOnly(){const a=room?.claims?.[room.activeClaim];if(!$('claimTimer'))return;if(a?.phase==='objection'&&a.objectionDeadline){const sec=Math.max(0,Math.ceil((a.objectionDeadline-Date.now())/1000));$('claimTimer').textContent='異議申し立て時間：残り '+Math.floor(sec/60)+'分'+(sec%60)+'秒';return;}if(!a?.deadline){$('claimTimer').textContent='回答受付中の制限時間：—';return;}const sec=Math.max(0,Math.ceil((a.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(sec/60)+'分'+(sec%60)+'秒'+(sec===0?'（時間切れ・自動で該当なし）':'');}
+$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value),c=[...centerTopics];if(n.length<16||h.length<8)return alert('普通のお題16個以上、難しいお題8個以上必要です。');if(!c.length)return alert('中央マス専用CSVを読み込んでください。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,centerTopics:c,finalResults:null});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];const newCard=makeCard(n,h,c);await roomRef.child('players/'+pid+'/card').set(newCard);await roomRef.child('players/'+pid+'/statusCard').set(newCard);await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
 $('toggleTopicsEditor').onclick=()=>{const box=$('topicsEditorFields');const willShow=box.classList.contains('hidden');box.classList.toggle('hidden',!willShow);$('toggleTopicsEditor').textContent=willShow?'お題リストを隠す':'お題リストを表示する';};
-$('centerCsvFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;const t=await f.text();$('centerTopics').value=t.replace(/^\uFEFF/,'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^\"|\"$/g,'')).join('\n');alert('中央マス用CSVを読み込みました。');});
 $('sampleBtn').onclick=setSamples;
 $('resetBtn').onclick=async()=>{
  if(!isHost)return alert('ホストだけが操作できます。');
@@ -614,16 +666,16 @@ $('resetBtn').onclick=async()=>{
  const n=room.normalTopics,h=room.hardTopics,c=room.centerTopics||[];
  const shuffled=shuffle((room.turnOrder||[]).filter(pid=>room.players?.[pid]));
  for(const pid of shuffled){
-   await roomRef.child('players/'+pid+'/card').set(makeCard(n,h,c));
+   const newCard=makeCard(n,h,c);await roomRef.child('players/'+pid+'/card').set(newCard);await roomRef.child('players/'+pid+'/statusCard').set(newCard);
    await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});
  }
- await roomRef.update({turnOrder:shuffled,history:[],claims:{},activeClaim:null,turnIndex:0,firstTurnChosen:true,finalResults:null,hostNotes:{}});
+ await roomRef.update({turnOrder:shuffled,history:[],claims:{},activeClaim:null,turnIndex:0,declarationCounts:Object.fromEntries(shuffled.map(pid=>[pid,0])),firstTurnChosen:true,finalResults:null,hostNotes:{}});
 };
 $('deleteRoomBtn').onclick=async()=>{
  if(!roomRef||!room||!isHost)return alert('部屋を削除できるのはホストだけです。');
  if(!confirm('この部屋と、参加者のカード・宣言記録をすべて削除します。元に戻せません。本当に削除しますか？'))return;
  if(!confirm('最終確認：本当にこの部屋を削除しますか？'))return;
- try{if(unsub)unsub();await roomRef.remove();room=null;roomRef=null;roomId=null;isHost=false;localPlayerId=null;selectedCellIndex=null;history.replaceState({},'',location.pathname);$('shareArea').classList.add('hidden');$('playersArea').classList.add('hidden');$('board').innerHTML='';$('roomStatus').textContent='部屋を削除しました。新しい部屋を作成できます。';$('myName').textContent='未参加';$('roomCodeLabel').textContent='部屋：—';$('turnLabel').textContent='順番：—';$('bingoCount').textContent='ビンゴ 0ライン';$('openCount').textContent='開けた数 0 / 25';$('history').innerHTML='';alert('部屋を削除しました。');}
+ try{if(unsub)unsub();await roomRef.remove();room=null;roomRef=null;roomId=null;isHost=false;localPlayerId=null;selectedCellIndex=null;clearSavedSession();history.replaceState({},'',location.pathname);$('shareArea').classList.add('hidden');$('playersArea').classList.add('hidden');$('board').innerHTML='';$('roomStatus').textContent='部屋を削除しました。新しい部屋を作成できます。';$('myName').textContent='未参加';$('roomCodeLabel').textContent='部屋：—';$('turnLabel').textContent='順番：—';$('bingoCount').textContent='ビンゴ 0ライン';$('openCount').textContent='開けた数 0 / 25';$('history').innerHTML='';alert('部屋を削除しました。');}
  catch(e){alert('部屋を削除できませんでした：'+e.message)}
 };
 
@@ -636,11 +688,13 @@ async function kickPlayer(pid){
 }
 async function raiseObjection(claimId,pid){
  if(!room||localPlayerId===pid)return;
+ const live=room.activeClaim?room.claims?.[room.activeClaim]:null;if(!live||live.phase!=='objection'||live.id!==claimId)return alert('異議申し立て時間（2分間）に申し立ててください。');
  const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('異議を申し立てられるのは直前の回答だけです。');
  const current=last.objections?.[pid];if(current)return alert('このマスにはすでに異議申し立てがあります。');
  await roomRef.child('history/'+(room.history.length-1)+'/objections/'+pid).set({by:localPlayerId,byName:currentPlayer()?.name||'参加者',status:'open',votes:{},createdAt:Date.now()});
 }
 async function voteObjection(claimId,pid,approve){
+ const live=room.activeClaim?room.claims?.[room.activeClaim]:null;if(!live||live.phase!=='objection'||live.id!==claimId)return alert('異議申し立て時間は終了しました。');
  const last=(room.history||[]).slice(-1)[0];if(!last||last.claimId!==claimId)return alert('直前の回答ではありません。');
  if(localPlayerId===pid)return alert('異議を申し立てられた本人は投票できません。');
  const obj=last.objections?.[pid];if(!obj||obj.status!=='open')return;
