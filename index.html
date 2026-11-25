@@ -48,7 +48,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <p class="muted">宣言した人を含め、全員がその単語に当てはまるマスをひとつだけ開けます。該当マスがない場合は「該当マスなし」を押してください。自分の番以外は宣言できません。</p>
 <h2 style="margin-top:20px">⑤ 宣言・開封の記録</h2>
 <div class="row"><button id="exportBtn">記録をCSV保存</button></div>
-<div class="host-ops"><h3>ホスト用操作</h3><div class="row"><button id="undoBtn">直前の宣言を取り消す</button><button id="resetBtn" class="danger">ゲームをやり直す</button><button id="deleteRoomBtn" class="danger">部屋を削除する</button></div></div>
+<div class="host-ops"><h3>ホスト用操作</h3><div class="row"><button id="hostSkipObjectionBtn" class="primary hidden" onclick="skipObjectionPeriod()">異議申し立て時間をスキップ</button><button id="undoBtn">直前の宣言を取り消す</button><button id="resetBtn" class="danger">ゲームをやり直す</button><button id="deleteRoomBtn" class="danger">部屋を削除する</button></div></div>
 <div id="objectionAreaOld" class="feed hidden"></div><div id="history" class="feed"></div>
 <div class="footer"><h3>遊び方のおすすめ</h3><p class="muted">・「いちご」なら「赤いもの」「甘いもの」など、当てはまる候補が複数あっても開けられるのは1マスだけ。<br>・開けるマスはプレイヤーごとに選びます。同じ単語でも、カードによって開くマスは違ってOK。<br>・同点対策に「先にビンゴした人が勝ち」か「全員のビンゴ数で勝負」を最初に決めておくとスムーズです。</p></div>
 </section>
@@ -590,6 +590,7 @@ function renderAll(){
  $('turnLabel').textContent='次の宣言者：'+(room.players?.[currentTurnId()]?.name||'—');
  const liveClaim=room.activeClaim?room.claims?.[room.activeClaim]:null;
  if($('hostTurnControls')){$('hostTurnControls').style.display=isHost?'flex':'none';if(isHost&&$('timeLimitMinutes'))$('timeLimitMinutes').value=room.timeLimitMinutes||5;}
+ const liveForHost=room.activeClaim?room.claims?.[room.activeClaim]:null;const skipBtn=$('hostSkipObjectionBtn');if(skipBtn)skipBtn.classList.toggle('hidden',!(isHost&&liveForHost?.phase==='objection'));
  if($('claimTimer')){if(liveClaim?.phase==='objection'&&liveClaim.objectionDeadline){const remain=Math.max(0,Math.ceil((liveClaim.objectionDeadline-Date.now())/1000));$('claimTimer').textContent='異議申し立て時間：残り '+Math.floor(remain/60)+'分'+(remain%60)+'秒';}else if(liveClaim?.deadline&&liveClaim.phase!=='objection'){const remain=Math.max(0,Math.ceil((liveClaim.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(remain/60)+'分'+(remain%60)+'秒'+(remain===0?'（時間切れ・自動で該当なし）':'');}else $('claimTimer').textContent='回答受付中の制限時間：宣言待ち';}
  const pendingClaim=room.activeClaim?room.claims?.[room.activeClaim]:null; if($('claimProgress')){if(pendingClaim){const waiting=Object.entries(pendingClaim.pending||{}).filter(([id,v])=>v.selected===-2).map(([id])=>room.players?.[id]?.name||'退出者');$('claimProgress').textContent=waiting.length?'回答待ち：'+waiting.join('、'):(pendingClaim.phase==='objection'?'全員回答済み・異議申し立て受付中':'全員の回答が完了しました');}else $('claimProgress').textContent='回答状況：宣言待ち';}
  const latestHistory=(room.history||[]).slice(-1)[0];
@@ -646,6 +647,17 @@ async function finishIfDone(){
  const results=Object.entries(active.pending||{}).map(([pid,x])=>({id:pid,name:state.players?.[pid]?.name||'退出者',topic:x.topic||'該当なし',index:x.selected,linesBefore:Number(x.linesBefore||0),linesAfter:countLines(state.players?.[pid]?.card||[]),bingoOnOtherTurn:active.by!==pid&&countLines(state.players?.[pid]?.card||[])>Number(x.linesBefore||0)}));
  const histRef=roomRef.child('history');
  await histRef.transaction(old=>{const arr=old||[];if(arr.some(h=>h.claimId===claimId))return arr;arr.push({word:active.word,by:active.by,byName:active.byName,time:active.time,results,claimId,turnIndexBefore:state.turnIndex||0});return arr;});
+}
+async function skipObjectionPeriod(){
+ if(!isHost)return alert('ホストだけが操作できます。');
+ const claimId=room?.activeClaim;
+ const active=claimId?room.claims?.[claimId]:null;
+ if(!active||active.phase!=='objection')return alert('現在、異議申し立て時間中ではありません。');
+ if(!confirm('異議申し立ての残り時間を終了し、ビンゴ・リーチ状況を更新して次の宣言者へ進みますか？'))return;
+ // Set the shared deadline into the past. The normal finalization transaction
+ // then performs the same status update and next-declarer selection as timeout.
+ await roomRef.child('claims/'+claimId+'/objectionDeadline').set(Date.now()-1000);
+ await finalizeAfterObjection();
 }
 async function finalizeAfterObjection(){
  const snap=await roomRef.get();const s=snap.val(),claimId=s?.activeClaim,a=s?.claims?.[claimId];
