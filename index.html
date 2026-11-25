@@ -27,15 +27,15 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 <label for="playerName">あなたの名前</label><input id="playerName" maxlength="20" placeholder="例：あおい">
 <div class="row" style="margin-top:8px"><button class="primary" id="createRoom">新しい部屋を作る</button><button id="joinRoom">この部屋に参加</button></div>
 <div id="shareArea" class="hidden"><label>招待URL（LINEで共有）</label><input id="shareUrl" readonly><div class="row" style="margin-top:7px"><button id="copyUrl">URLをコピー</button><button id="copyCode">部屋コードをコピー</button></div></div>
-<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><div class="row" id="hostTurnControls"><label>制限時間（分）<input id="timeLimitMinutes" type="number" min="1" max="180" value="5"></label><button id="saveTimeLimit">制限時間を設定</button></div><div class="row"><button id="announceResultsBtn" class="primary">結果発表（ホスト）</button></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
+<div id="playersArea" class="hidden"><h3>参加者・順番</h3><div id="players" class="players"></div><div class="row" id="hostTurnControls"><label>制限時間（分）<input id="timeLimitMinutes" type="number" min="1" max="180" value="5"></label><button id="saveTimeLimit">制限時間を設定</button></div><p class="muted">順番は参加順です。自分の番で単語を宣言してください。宣言後、全員が自分のカードでマスを選び、確定ボタンを押します。</p></div>
 <div class="footer">
 <h2>② お題を編集（ホスト用）</h2>
 <p class="muted">1行に1つ。CSV/Excelから貼り付けできます。難しいお題は中央以外の両斜め8マスに配置します。</p>
 <div class="row"><button type="button" id="toggleTopicsEditor">お題リストを表示する</button></div><div id="topicsEditorFields" class="hidden"><label for="normalTopics">普通のお題（16個以上）</label><textarea id="normalTopics"></textarea>
 <label for="hardTopics">難しいお題（8個以上）</label><textarea id="hardTopics"></textarea>
-<label for="centerCsvFile">中央マス専用CSV（1列・1行に1つ）</label><input id="centerCsvFile" type="file" accept=".csv,text/csv"><div id="centerCsvStatus" class="muted">中央マス用CSVを読み込んでください。中央マスはプレイヤーごとにランダムで決まります。</div></div>
-<div class="row"><button id="sampleBtn">サンプル100題を読み込む</button><button id="applyTopics" class="primary">お題を部屋に反映</button></div>
-<p class="muted">普通・難しいお題は従来どおりリストを使います。中央マス専用CSVは1列形式で読み込み、各プレイヤーの中央に別々のランダムなお題を配置します。</p>
+<label for="centerCsvFile">中央マス専用お題（初期設定済み・CSVで差し替え可能）</label><input id="centerCsvFile" type="file" accept=".csv,text/csv"><div id="centerCsvStatus" class="muted">添付の中央.csvを初期お題として読み込み済みです。中央マスはプレイヤーごとにランダムで決まります。</div></div>
+<div class="row"><button id="sampleBtn">添付CSVのお題に戻す</button><button id="applyTopics" class="primary">お題を部屋に反映</button></div>
+<p class="muted">普通・難しいお題は従来どおりリストを使います。中央マスのお題は初期設定済みです。必要ならCSVを選択して差し替えられます。各プレイヤーの中央には別々のランダムなお題を配置します。</p>
 </div>
 <div class="footer">
 <h3>接続設定（初回のみ）</h3>
@@ -46,7 +46,7 @@ textarea{min-height:105px;resize:vertical;font-size:13px;line-height:1.55}button
 </div>
 </section>
 <section class="panel">
-<div id="topInfoPanel" class="status" style="margin-bottom:10px"><h3 style="margin:0 0 8px">📊 あなたの状況</h3><div id="topPlayerStatus">ビンゴ・リーチ情報を表示します</div><div id="myScore">現在の得点：—</div><div style="margin-top:8px;font-weight:700">👥 ほかの人の状況</div><div id="otherPlayersStatus" class="players" style="margin-top:6px"></div></div><div id="topObjectionArea" class="feed" style="border:2px solid #e4a23a;background:#fffaf0;padding:10px;border-radius:12px;margin-bottom:12px"></div><div id="resultsPanel" class="feed"></div>
+<div id="topInfoPanel" class="status" style="margin-bottom:10px"><h3 style="margin:0 0 8px">📊 あなたの状況</h3><div id="topPlayerStatus">ビンゴ・リーチ情報を表示します</div><div style="margin-top:8px;font-weight:700">👥 ほかの人の状況</div><div id="otherPlayersStatus" class="players" style="margin-top:6px"></div></div><div id="topObjectionArea" class="feed" style="border:2px solid #e4a23a;background:#fffaf0;padding:10px;border-radius:12px;margin-bottom:12px"></div>
 <div class="boardtop"><h2>③ あなたのビンゴカード</h2><span id="myName" class="pill">未参加</span></div>
 <div id="declaredTopic" class="declared-topic"><div class="label">いま宣言されているお題</div><div id="declaredWord" class="word">まだ宣言はありません</div><div id="declaredBy" class="by">ゲーム開始を待っています</div></div><div id="board" class="board"></div>
 <div class="row"><div class="status"><div class="metric" id="bingoCount">ビンゴ 0ライン</div><div class="small" id="openCount">開けた数 0 / 25</div></div><div class="status"><div class="metric" id="turnLabel">順番：—</div><div class="small" id="roomCodeLabel">部屋：—</div></div></div>
@@ -453,7 +453,10 @@ const sampleHard = `歴史上の人物
 災害時に特に重要になるもの
 人生の節目に登場するもの`;
 const $=id=>document.getElementById(id);
-let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null,selectedCellIndex=null,centerTopics=[];
+const DEFAULT_EASY_TOPICS = ["闇属性モンスター", "光属性モンスター", "地属性モンスター", "水属性モンスター", "炎属性モンスター", "風属性モンスター", "神属性モンスター", "機械族モンスター", "ドラゴン族モンスター", "魔法使い族モンスター", "戦士族モンスター", "悪魔族モンスター", "天使族モンスター", "アンデット族モンスター", "水族モンスター", "炎族モンスター", "岩石族モンスター", "昆虫族モンスター", "植物族モンスター", "サイキック族モンスター", "サイバース族モンスター", "鳥獣族モンスター", "獣族モンスター", "獣戦士族モンスター", "恐竜族モンスター", "爬虫類族モンスター", "海竜族モンスター", "幻竜族モンスター", "幻魔族モンスター", "通常モンスター", "効果モンスター", "儀式モンスター", "融合モンスター", "シンクロモンスター", "エクシーズモンスター", "ペンデュラムモンスター", "リンクモンスター", "通常魔法カード", "速攻魔法カード", "永続魔法カード", "装備魔法カード", "フィールド魔法カード", "儀式魔法カード", "通常トラップカード", "永続トラップカード", "カウンター罠カード", "攻撃力3000以上のモンスター", "攻撃力0のモンスター", "守備力0のモンスター", "攻撃力と守備力が同じモンスター", "攻撃力が2500のモンスター", "レベル4以下のモンスター", "レベル7以上のモンスター", "ランク4のエクシーズモンスター", "リンク2のリンクモンスター", "ペンデュラムスケール1のカード", "レベル1のモンスター", "レベル8のモンスター", "守備力3000以上のモンスター", "攻撃力が1500以下のモンスター", "攻撃力が奇数のモンスター", "カードを1枚ドローする効果があるカード", "デッキからカードを墓地へ送る効果を持つカード", "手札を捨てる効果があるカード", "フィールドのモンスターを破壊する効果を持つカード", "魔法・罠カードを破壊する効果を持つカード", "カードを除外する効果を持つカード", "墓地からモンスターを特殊召喚する効果を持つカード", "手札からモンスターを特殊召喚する効果を持つカード", "デッキからモンスターを特殊召喚する効果を持つカード", "ライフポイントを回復する効果を持つカード", "相手に効果ダメージを与える効果を持つカード", "直接攻撃できる効果を持つモンスター", "効果では破壊されないモンスター", "戦闘では破壊されないモンスター", "カードの効果の対象にならない効果を持つカード", "デッキからカードを手札に加えるサーチ効果を持つカード", "表示形式を変更する効果を持つカード", "モンスターの攻撃力を上げる効果を持つカード", "モンスターの攻撃力を下げる効果を持つカード", "攻撃を無効にする効果を持つカード", "効果の発動を無効にする効果を持つカード", "モンスターのコントロールを得る効果を持つカード", "手札に戻す（バウンス）効果を持つカード", "デッキに戻す効果を持つカード", "チューナーモンスター", "トークンを特殊召喚する効果を持つカード", "裏側守備表示でセットする効果を持つカード", "攻撃対象を変更する効果を持つカード", "相手ターンに発動できる効果（誘発即時効果）を持つカード", "装備カードになる効果を持つカード", "カウンターを置く効果を持つカード", "コイン投げを行う効果を持つカード", "サイコロを振る効果を持つカード", "墓地で発動する効果を持つカード", "召喚成功時に発動する効果を持つカード", "特殊召喚成功時に発動する効果を持つカード", "リバースした時に発動する効果を持つカード", "破壊された時に発動する効果を持つカード", "墓地へ送られた時に発動する効果を持つカード", "除外された時に発動する効果を持つカード", "フィールド魔法を検索・配置する効果を持つカード", "自分の墓地のカードをデッキに戻す効果を持つカード", "相手の手札を確認する効果を持つカード", "相手の手札をハンデスする効果を持つカード", "攻撃宣言時に発動できる効果を持つカード", "バトルフェイズを終了させる効果を持つカード", "守備貫通ダメージを与える効果を持つカード", "ペンデュラムスケール8以上のカード", "リンク1のモンスター", "ランク8のエクシーズモンスター", "レベル12のモンスター", "攻撃力2000の通常モンスター", "装備魔法をサーチするカード", "フィールド魔法を破壊するカード", "罠カードを破壊するカード", "自分のライフを払って発動するカード", "デッキから魔法カードを墓地へ送るカード", "デッキから罠カードを墓地へ送るカード", "手札のモンスターを見せて発動するカード", "自分フィールドのモンスターをリリースして発動するカード", "相手フィールドのモンスターの数を参照するカード", "墓地の魔法カードを除外して発動するカード", "墓地の罠カードを除外して発動するカード", "デッキの一番上に戻す効果を持つカード", "相手の墓地のカードを手札に戻す効果", "モンスターのレベルを上げる効果", "モンスターのレベルを下げる効果", "発動後フィールドに残り続ける魔法カード", "相手にドローさせる効果を持つカード", "自分と相手のライフを同じにする効果を持つカード", "相手の攻撃力を0にする効果を持つカード", "守備力を攻撃力に加算する効果を持つカード", "戦闘ダメージを0にする効果を持つカード", "効果ダメージを0にする効果を持つカード", "効果ダメージを相手に反射する効果を持つカード", "モンスターを裏側守備表示にする効果を持つカード", "表側攻撃表示にする効果を持つカード", "モンスターの種族を変更する効果を持つカード", "モンスターの属性を変更する効果を持つカード", "墓地のカードを全て除外する効果を持つカード", "お互いの墓地のカードを全てデッキに戻す効果を持つカード", "手札から魔法カードを捨てる効果を持つカード", "手札から罠カードを捨てる効果を持つカード", "デッキのカードを5枚墓地へ送る効果を持つカード", "相手の魔法＆罠ゾーンのカードを全て破壊する効果を持つカード", "相手のフィールドのモンスターを全て破壊する効果を持つカード", "攻撃力3000のドラゴン族モンスター", "守備力2000の岩石族モンスター", "光属性の魔法使い族モンスター", "闇属性の悪魔族モンスター", "水属性の水族モンスター", "炎属性の炎族モンスター", "風属性の鳥獣族モンスター", "地属性の戦士族モンスター", "レベル2のチューナーモンスター", "レベル3のチューナーモンスター", "レベル4のチューナーモンスター", "融合魔法を使わずに特殊召喚できる融合モンスター", "召喚権を増やす効果（通常召喚をもう1度行える）", "手札の枚数を参照して強くなるモンスター", "エクストラデッキから特殊召喚されたモンスター", "墓地から特殊召喚されたモンスター", "アドバンス召喚（生け贄召喚）に成功した時に発動する効果を持つカード", "反転召喚に成功した時に発動する効果を持つカード", "自分のメインフェイズに発動できる効果を持つカード", "自分のエンドフェイズに発動する効果を持つカード", "相手のスタンバイフェイズに発動する効果を持つカード", "攻撃を直接無効にしてバトルフェイズを終了する効果を持つカード", "装備モンスターの攻撃力を1000アップする装備魔法", "自分の墓地のモンスターの数×100攻撃力が上がる効果を持つカード", "フィールドのカードの数×200ダメージを与える効果を持つカード", "相手の場にモンスターが存在しない場合に直接攻撃できるモンスター", "相手の場にのみモンスターが存在する場合に特殊召喚できるモンスター", "自分フィールドにモンスターが存在しない場合に手札から特殊召喚できるモンスター", "カード名に「ネオス」が含まれるカード", "カード名に「HERO」が含まれるカード", "カード名に「ドラゴン」が含まれるカード", "カード名に「ガジェット」が含まれるカード", "カード名に「シンクロン」が含まれるカード", "カード名に「オッドアイズ」が含まれるカード", "カード名に「コード・トーカー」が含まれるカード", "効果テキストに「勝敗を決する」または「勝利する」とあるカード（特殊勝利）", "サイコロの出目によって効果が変わるカード", "コイントスの裏表によって効果が変わるカード", "カード名を変更する効果を持つカード", "カードの元々の攻撃力を参照する効果を持つカード", "相手の墓地のモンスターの数を参照する効果を持つカード", "除外されているカードの数を参照する効果を持つカード", "自分の魔法・罠ゾーンのカードを全て破壊する効果を持つカード", "手札を全て捨てる効果を持つカード", "デッキを全て墓地へ送る効果を持つカード", "相手フィールドのモンスターの表示形式を変更する効果を持つカード", "自分フィールドのモンスターの表示形式を変更する効果を持つカード", "自分のLPを100になるように払う効果を持つカード", "相手に1000以上のダメージを与える効果を持つカード", "ライフを2000以上回復する効果を持つカード"];
+const DEFAULT_HARD_TOPICS = ["水属性ランク2", "攻撃宣言時に発動できるカード", "フィールドのカードを対象にとって発動できるカード", "フィールドか墓地のカードを除外できるカード", "モンスターをリリースできるカード", "墓地除外から特殊召喚できるカード", "攻撃力を変動できるカード", "カウンター罠", "墓地のカードをデッキに戻してドローできるカード", "モンスターをデッキから特殊召喚できるカード", "「日本語の色の名前」が入っているカード名", "自力で裏守備になれるモンスター", "今年発売したカード", "クオシク、プリシクが存在するカード", "未再録カード", "初出がデッキビルドパックなカード", "手足のないモンスターカード", "カード名に「神」を含むカード", "攻撃力が「？」のモンスター", "元々の攻撃力と守備力の合計が「0」のモンスター", "攻撃力が1850のモンスター", "守備力が「0」以外の「端数」のモンスター（例：1350、2130など）", "光属性・悪魔族のモンスター", "レベル11のモンスター", "ランク12のエクシーズモンスター", "儀式魔法カード", "通常罠かつ｢イラストに女の子が描かれている」カード", "「ペンデュラム・チューナー」モンスター", "「特殊召喚モンスター」（テキストの最初に「通常召喚できない。」とあるもの）", "カード名に「竜」と付くが、ドラゴン族ではないモンスター", "カード名に「デーモン」と付くが、悪魔族ではないモンスター", "テキストに「選んで」と書かれている", "テキストに「墓地へ送られた場合」ではなく「墓地へ送られた時」と書かれている", "テキストに「発動できない」ではなく「効果は無効化されない」と書かれている", "テキストに「装備カード扱いとして」ではなく「ユニオンモンスター」と書かれている", "コントロールを入れ替えるカード", "テキストに「お互いのプレイヤーは」と書かれている", "テキストに「元々の攻撃力の半分」になる効果がある", "テキストに「守備力を超えた分だけ戦闘ダメージを与える」（貫通）という", "テキストに「デッキの一番上に戻す」と書かれている", "テキストに「スキップする」と書かれている", "テキストに「デュエル中に1度しか使用できない」がある", "1つの効果テキストの中に「●」の箇条書きが3つ以上ある", "テキストに「コイントスを3回行う」とある", "カード名が「漢字のみ」で構成されている", "カード名に「数字（1、2、Ⅰ、Ⅱなど）」が含まれている", "テキストに「適用する」という言葉が使われている", "イラストの背景に「満月、または三日月」がはっきり描かれている", "イラストに「歯車」が描かれている", "イラストのキャラクターが「仮面（マスク）」を被っている", "翼のあるモンスター", "武器を持っているモンスター", "見た目がネコ科のモンスター", "○○クリボー", "○○マジシャン", "○○ドラゴン", "効果なし融合モンスター", "ダメステに使える速攻魔法", "装備できる通常罠", "選択効果のあるカード（●で複数のうちからえらぶやつ）", "デュアルモンスター", "自身の効果で直接攻撃できるモンスター", "強制効果を持つカード", "表示形式を変更する効果を持つカード", "2枚以上ドローできるカード", "「○○召喚を行う」効果を持つカード", "レベルを変動させる効果を持つカード", "レベル5以上の通常モンスター", "シンクロチューナーモンスター", "トークンを特殊召喚する効果を持つ魔法・罠カード", "「お互いの墓地のカードを全て」と書かれている", "テキストに「発動を無効にする」ではなく「効果を無効にする」と書かれている", "テキストに「デッキから手札に加える」があるが、加えるのが魔法・罠限定", "裏側表示で除外するカード", "攻撃対象を移し替えるカード", "手札を全て捨てる効果を持つカード", "バトルフェイズを終了させるカード", "カード名がすべて「ひらがな」で構成されている（ルビ除く）", "カード名が10文字以上", "テキストに「禁じられた」という名前が含まれているカード", "カード名の最初の1文字が「濁点・半濁点（ガ、パなど）」から始まる", "自身が手に入れて嬉しかった高レアカード", "シンプルに好きなカード", "シンプルに今欲しいカード", "当時禁止になって悲しかったカード", "対面で使われて驚いたカード", "名前の語感・響きが好きなカード"];
+const DEFAULT_CENTER_TOPICS = ["自身が手に入れて嬉しかった高レアカード", "シンプルに好きなカード", "シンプルに今欲しいカード", "当時禁止になって悲しかったカード", "対面で使われて驚いたカード", "名前の語感・響きが好きなカード"];
+let app=null,db=null,user=null,roomId=null,roomRef=null,room=null,isHost=false,unsub=null,localPlayerId=null,selectedCellIndex=null,centerTopics=DEFAULT_CENTER_TOPICS.slice();
 const SESSION_KEY='odaiBingoSessionV1';
 function readSavedSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{return null}}
 function saveSession(){if(!roomId||!localPlayerId)return;try{localStorage.setItem(SESSION_KEY,JSON.stringify({roomId,playerId:localPlayerId,selectedCellIndex}))}catch(e){console.warn('復帰情報を保存できません',e)}}
@@ -461,7 +464,13 @@ function clearSavedSession(){try{localStorage.removeItem(SESSION_KEY)}catch{}}
 const uid=()=>Math.random().toString(36).slice(2,10);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function splitTopics(text){return [...new Set(text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(s=>s.replace(/^"|"$/g,'')))];}
-function setSamples(){ $('normalTopics').value=sampleNormal; $('hardTopics').value=sampleHard; }
+function setSamples(){
+ $('normalTopics').value=DEFAULT_EASY_TOPICS.join('\n');
+ $('hardTopics').value=DEFAULT_HARD_TOPICS.join('\n');
+ centerTopics=DEFAULT_CENTER_TOPICS.slice();
+ if($('centerCsvStatus'))$('centerCsvStatus').textContent=`中央マス用の初期お題を読み込み済み（${centerTopics.length}件）。各プレイヤーの中央マスに別々のランダムなお題を配置します。CSVを選ぶと差し替えできます。`;
+ if($('centerCsvFile'))$('centerCsvFile').value='';
+}
 function parseCsvTopics(csvText){
  const rows=[];let row=[],field='',quoted=false;const text=String(csvText||'').replace(/^\uFEFF/,'');
  for(let i=0;i<text.length;i++){
@@ -586,7 +595,7 @@ function renderAll(){
  $('declaredWord').textContent=liveClaim?.word||latestHistory?.word||'まだ宣言はありません';
  $('declaredBy').textContent=liveClaim?('宣言者：'+(liveClaim.byName||'—')+(liveClaim.phase==='objection'?' ／ 異議申し立て受付中':'') ):(latestHistory?('直近の宣言者：'+(latestHistory.byName||'—')+' ／ 次の宣言者：'+(room.players?.[currentTurnId()]?.name||'—')):'ゲーム開始を待っています');
  $('declareBtn').disabled=localPlayerId!==currentTurnId()||!!room.activeClaim;$('wordInput').disabled=localPlayerId!==currentTurnId()||!!room.activeClaim;
- const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'')+(selectedCellIndex===i?' selected':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId]||room.claims[room.activeClaim].pending[localPlayerId].selected!==-2||room.claims[room.activeClaim].phase!=='answering';b.onclick=()=>markCell(i);board.appendChild(b)});const shownCard=me.statusCard||me.card;const lines=countLines(shownCard);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';$('topPlayerStatus').textContent=playerStatus(shownCard)+' ／ ビンゴ '+lines+'ライン ／ 開封 '+me.card.filter(c=>c.open).length+'/25'; $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.statusCard||p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>'; const finalMe=(room.finalResults||[]).find(r=>r.id===localPlayerId); const openedNow=me.card.filter(c=>c.open).length; $('myScore').textContent='現在の得点：'+(finalMe?finalMe.score:(lines*10+openedNow))+'点'+(finalMe?'（結果発表後の確定点）':'（ビンゴ10点/ライン＋開封マス数。追加点は結果発表後に確定）');if(lines>lastBingoLines)showBingo(me.name);lastBingoLines=lines;}
+ const board=$('board');board.innerHTML='';if(me?.card){me.card.forEach((cell,i)=>{const b=document.createElement('button');b.className='cell'+(cell.hard?' hard':'')+(cell.open?' open':'')+(cell.topic==='FREE'?' free':'')+(selectedCellIndex===i?' selected':'');b.textContent=cell.topic;b.title=cell.hard?'難しいお題':'';b.disabled=cell.open||!room.claims?.[room.activeClaim]||!room.claims[room.activeClaim].pending?.[localPlayerId]||room.claims[room.activeClaim].pending[localPlayerId].selected!==-2||room.claims[room.activeClaim].phase!=='answering';b.onclick=()=>markCell(i);board.appendChild(b)});const shownCard=me.statusCard||me.card;const lines=countLines(shownCard);$('bingoCount').textContent='ビンゴ '+lines+'ライン';$('openCount').textContent='開けた数 '+me.card.filter(c=>c.open).length+' / 25';$('topPlayerStatus').textContent=playerStatus(shownCard)+' ／ ビンゴ '+lines+'ライン ／ 開封 '+me.card.filter(c=>c.open).length+'/25'; $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.statusCard||p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>';if(lines>lastBingoLines)showBingo(me.name);lastBingoLines=lines;}
  const active=room.activeClaim?room.claims?.[room.activeClaim]:null;
  if(active?.pending?.[localPlayerId]){$('claimArea').classList.remove('hidden');$('claimArea').innerHTML=`宣言「<b>${esc(active.word)}</b>」に当てはまるマスを選び、「選んだマスを開く（確定）」を押してください。<br><span class="muted">${selectedCellIndex!==null?'選択中：'+esc(me?.card?.[selectedCellIndex]?.topic||''):'まだマスを選んでいません'}</span>`}else{$('claimArea').classList.add('hidden');$('claimArea').textContent='';selectedCellIndex=null} $('confirmCellBtn').disabled=selectedCellIndex===null||!active?.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;
  $('noneBtn').disabled=!active||active.phase!=='answering'||!active.pending?.[localPlayerId]||active.pending[localPlayerId].selected!==-2;$('history').innerHTML=(room.history||[]).slice().reverse().map(h=>`<div class="feeditem"><b>${esc(h.word)}</b> — 宣言：${esc(h.byName)}<br>${(h.results||[]).map(x=>esc(x.name)+'：'+esc(x.topic||'該当なし')).join(' ／ ')}<div class="muted">${new Date(h.time).toLocaleString('ja-JP')}</div></div>`).join('')||'<p class="muted">まだ宣言はありません。</p>';
@@ -599,9 +608,7 @@ function renderAll(){
   return `<div class="feeditem"><b>${esc(x.name)}</b>：${esc(x.topic||'該当なし')} <button ${canObject?'':'disabled'} onclick="raiseObjection('${last.claimId}','${x.id}')">異議申し立て</button>${obj?`<div>異議：（${obj.status==='open'?'投票中':obj.status==='approved'?'承認':'却下'}） ${voteButtons}<div class="muted">承認 ${Object.values(votes).filter(v=>v===true).length} ／ 却下 ${Object.values(votes).filter(v=>v===false).length}</div></div>`:''}</div>`;
  }).join('')||'<p class="muted">直前の回答でマスを開けた人はいません。</p>'):'';
  $('otherPlayersStatus').innerHTML=(room.turnOrder||[]).filter(id=>id!==localPlayerId).map(id=>{const p=room.players?.[id];if(!p)return '';const card=p.statusCard||p.card||[];return `<span class="player"><b>${esc(p.name)}</b><small>${esc(playerStatus(card))} ／ ビンゴ ${countLines(card)}ライン</small></span>`}).join('')||'<span class="muted">ほかの参加者はいません</span>';
- if(!me){$('topPlayerStatus').textContent=isHost?'司会者モード：参加者の状況は参加者一覧で確認できます':'参加者情報を読み込み中';$('myScore').textContent=isHost?'司会者は得点対象外です':'現在の得点：—';}
- $('announceResultsBtn').style.display=isHost?'inline-block':'none';
- $('resultsPanel').innerHTML=room.finalResults?'<h3>🏆 結果発表</h3>'+room.finalResults.map((r,i)=>`<div class="feeditem"><b>${i+1}位：${esc(r.name)}</b> — ${r.score}点（ビンゴ ${r.lines}×10点、開封 ${r.opened}点、追加 ${r.extra}点）</div>`).join(''):'';
+ if(!me){$('topPlayerStatus').textContent=isHost?'司会者モード：参加者の状況は参加者一覧で確認できます':'参加者情報を読み込み中';}
 
 
 }
@@ -648,7 +655,7 @@ async function finalizeAfterObjection(){
  const counts={...(state.declarationCounts||{})};order.forEach(pid=>{counts[pid]=Number(counts[pid]||0)});counts[a.by]=Number(counts[a.by]||0)+1;
  const next=chooseNextDeclarer(order,counts);const nextIndex=Math.max(0,order.indexOf(next));
  const updates={};for(const pid of order){const card=(state.players[pid].card||[]);updates['players/'+pid+'/statusCard']=card;}
- updates.declarationCounts=counts;updates.turnIndex=nextIndex;updates.activeClaim=null;updates.forcedTurn=null;updates.finalResults=null;
+ updates.declarationCounts=counts;updates.turnIndex=nextIndex;updates.activeClaim=null;updates.forcedTurn=null;
  await roomRef.update(updates);
 }
 async function forceNextTurn(pid){if(!isHost)return;const order=(room.turnOrder||[]).filter(id=>room.players?.[id]);const idx=order.indexOf(pid);if(idx<0)return;await roomRef.update({turnIndex:idx,forcedTurn:pid});}
@@ -657,7 +664,7 @@ let timeoutSubmitting=false;
 async function autoSubmitOnTimeout(){const a=room?.claims?.[room.activeClaim];if(!a||!a.pending?.[localPlayerId]||a.pending[localPlayerId].selected!==-2||Date.now()<Number(a.deadline||Infinity)||timeoutSubmitting)return;timeoutSubmitting=true;try{await roomRef.child('claims/'+a.id+'/pending/'+localPlayerId).update({selected:-1,topic:'時間切れ（該当なし）',timedOut:true});await finishIfDone();}finally{timeoutSubmitting=false;}}
 setInterval(()=>{if(room?.activeClaim){renderTimerOnly();if(room.claims?.[room.activeClaim]?.phase==='objection')finalizeAfterObjection();else autoSubmitOnTimeout();}},1000);
 function renderTimerOnly(){const a=room?.claims?.[room.activeClaim];if(!$('claimTimer'))return;if(a?.phase==='objection'&&a.objectionDeadline){const sec=Math.max(0,Math.ceil((a.objectionDeadline-Date.now())/1000));$('claimTimer').textContent='異議申し立て時間：残り '+Math.floor(sec/60)+'分'+(sec%60)+'秒';return;}if(!a?.deadline){$('claimTimer').textContent='回答受付中の制限時間：—';return;}const sec=Math.max(0,Math.ceil((a.deadline-Date.now())/1000));$('claimTimer').textContent='回答締切まで：'+Math.floor(sec/60)+'分'+(sec%60)+'秒'+(sec===0?'（時間切れ・自動で該当なし）':'');}
-$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value),c=[...centerTopics];if(n.length<16||h.length<8)return alert('普通のお題16個以上、難しいお題8個以上必要です。');if(!c.length)return alert('中央マス専用CSVを読み込んでください。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,centerTopics:c,finalResults:null});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];const newCard=makeCard(n,h,c);await roomRef.child('players/'+pid+'/card').set(newCard);await roomRef.child('players/'+pid+'/statusCard').set(newCard);await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
+$('applyTopics').onclick=async()=>{if(!room||!isHost)return alert('お題の反映は部屋を作った人だけができます。');const n=splitTopics($('normalTopics').value),h=splitTopics($('hardTopics').value),c=[...centerTopics];if(n.length<16||h.length<8)return alert('普通のお題16個以上、難しいお題8個以上必要です。');if(!c.length)return alert('中央マス専用CSVを読み込んでください。');if(!confirm('全員のカードを新しいお題で作り直します。続けますか？'))return;await roomRef.update({normalTopics:n,hardTopics:h,centerTopics:c});const s=(await roomRef.get()).val();for(const pid of s.turnOrder){const p=s.players[pid];const newCard=makeCard(n,h,c);await roomRef.child('players/'+pid+'/card').set(newCard);await roomRef.child('players/'+pid+'/statusCard').set(newCard);await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});}await roomRef.update({history:[],claims:{},activeClaim:null,turnIndex:0});alert('お題を反映し、全員のカードを作り直しました。');};
 $('toggleTopicsEditor').onclick=()=>{const box=$('topicsEditorFields');const willShow=box.classList.contains('hidden');box.classList.toggle('hidden',!willShow);$('toggleTopicsEditor').textContent=willShow?'お題リストを隠す':'お題リストを表示する';};
 $('sampleBtn').onclick=setSamples;
 $('resetBtn').onclick=async()=>{
@@ -669,7 +676,7 @@ $('resetBtn').onclick=async()=>{
    const newCard=makeCard(n,h,c);await roomRef.child('players/'+pid+'/card').set(newCard);await roomRef.child('players/'+pid+'/statusCard').set(newCard);
    await roomRef.child('players/'+pid).update({reachAt:null,reachClaimId:null});
  }
- await roomRef.update({turnOrder:shuffled,history:[],claims:{},activeClaim:null,turnIndex:0,declarationCounts:Object.fromEntries(shuffled.map(pid=>[pid,0])),firstTurnChosen:true,finalResults:null,hostNotes:{}});
+ await roomRef.update({turnOrder:shuffled,history:[],claims:{},activeClaim:null,turnIndex:0,declarationCounts:Object.fromEntries(shuffled.map(pid=>[pid,0])),firstTurnChosen:true,hostNotes:{}});
 };
 $('deleteRoomBtn').onclick=async()=>{
  if(!roomRef||!room||!isHost)return alert('部屋を削除できるのはホストだけです。');
@@ -714,25 +721,7 @@ async function voteObjection(claimId,pid,approve){
    }
  }
 }
-async function announceResults(){
- if(!isHost)return alert('結果発表はホストだけができます。');
- const scores=(room.turnOrder||[]).filter(id=>room.players?.[id]).map(id=>{
-  const p=room.players[id],card=p.card||[],lines=countLines(card),opened=card.filter(c=>c.open).length;
-  const extra=(room.history||[]).filter(h=>(h.results||[]).some(r=>r.id===id&&r.bingoOnOtherTurn&&!r.invalidated)).length*5;
-  return {id,name:p.name,lines,opened,extra,score:lines*10+opened+extra};
- }).sort((a,b)=>b.score-a.score||b.lines-a.lines||b.opened-a.opened);
- await roomRef.update({finalResults:scores,resultsAnnouncedAt:Date.now()});
-}
-function countLinesAtHistory(h,pid){
- const p=room.players?.[pid];if(!p)return 0;
- const card=(p.card||[]).map(c=>({...c}));
- // Approximate whether the just-recorded opening completed a line, using current card minus later openings.
- const result=(h.results||[]).find(r=>r.id===pid);if(!result||result.index<0)return 0;
- const index=h.results.indexOf(result);
- const lines=bingoLines(card);
- return lines.some(line=>line.includes(result.index)&&line.every(i=>card[i]?.open))?1:0;
-}
-$('announceResultsBtn').onclick=announceResults;
+
 $('undoBtn').onclick=async()=>{
  if(!isHost)return alert('ホストだけが操作できます。');
  if(!room.history?.length)return alert('取り消せる回答がありません。');
